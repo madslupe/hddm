@@ -79,7 +79,14 @@ def wiener_like_rlddm(np.ndarray[double, ndim=1] x,
                       np.ndarray[long, ndim=1] response,
                       np.ndarray[double, ndim=1] feedback,
                       np.ndarray[long, ndim=1] split_by,
-                      double q, double alpha, double pos_alpha, double v, 
+                      np.ndarray[double, ndim=1] stn,
+                      np.ndarray[double, ndim=1] theta,
+                      np.ndarray[double, ndim=1] presma,
+                      np.ndarray[double, ndim=1] caud,
+                      double q, double alpha, double pos_alpha,  
+                      double b_stn, double b_theta, double b_presma, double b_caud, double b_conflict, 
+                      double b_stn_theta, double b_theta_conflict, double b_stn_conflict, double b_presma_conflict, double b_theta_stn_conflict,
+                      double v, 
                       double sv, double a, double z, double sz, double t,
                       double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                       double p_outlier=0, double w_outlier=0):
@@ -95,6 +102,10 @@ def wiener_like_rlddm(np.ndarray[double, ndim=1] x,
     cdef np.ndarray[double, ndim=1] qs = np.array([q, q])
     cdef np.ndarray[double, ndim=1] xs
     cdef np.ndarray[double, ndim=1] feedbacks
+    cdef np.ndarray[double, ndim=1] stns
+    cdef np.ndarray[double, ndim=1] thetas
+    cdef np.ndarray[double, ndim=1] presmas
+    cdef np.ndarray[double, ndim=1] cauds
     cdef np.ndarray[long, ndim=1] responses
     cdef np.ndarray[long, ndim=1] unique = np.unique(split_by)
 
@@ -112,8 +123,14 @@ def wiener_like_rlddm(np.ndarray[double, ndim=1] x,
         # select trials for current condition, identified by the split_by-array
         feedbacks = feedback[split_by == s]
         responses = response[split_by == s]
+        stns = stn[split_by == s]
+        thetas = theta[split_by == s]
+        presmas = presma[split_by == s]
+        cauds = caud[split_by == s]
         xs = x[split_by == s]
         s_size = xs.shape[0]
+        qs[0] = q
+        qs[1] = q
 
         # don't calculate pdf for first trial but still update q
         if feedbacks[0] > qs[responses[0]]:
@@ -127,9 +144,12 @@ def wiener_like_rlddm(np.ndarray[double, ndim=1] x,
             alfa * (feedbacks[0] - qs[responses[0]])
 
         # loop through all trials in current condition
-        for i in range(1, s_size):
-            p = full_pdf(xs[i], ((qs[1] - qs[0]) * v), sv, a, z,
-                         sz, t, st, err, n_st, n_sz, use_adaptive, simps_err)
+        for i in range(1, s_size): 
+            p = full_pdf(xs[i], (qs[1] - qs[0]) * (v + (b_caud*cauds[i])) , sv, max( 0.1, ( a + (stns[i]*b_stn) + (thetas[i]*b_theta) + \
+                (presmas[i]*b_presma) + (abs(qs[1] - qs[0])*b_conflict) + (thetas[i]*stns[i]*b_stn_theta) + \
+                (thetas[i]*abs(qs[1] - qs[0])*b_theta_conflict) + (stns[i]*abs(qs[1] - qs[0])*b_stn_conflict) + \
+                (presmas[i]*abs(qs[1] - qs[0])*b_presma_conflict) + (thetas[i]*stns[i]*abs(qs[1] - qs[0])*b_theta_stn_conflict) )), 
+                z, sz, t, st, err, n_st, n_sz, use_adaptive, simps_err)
             # If one probability = 0, the log sum will be -Inf
             p = p * (1 - p_outlier) + wp_outlier
             if p == 0:
@@ -187,6 +207,8 @@ def wiener_like_rl(np.ndarray[long, ndim=1] response,
         feedbacks = feedback[split_by == s]
         responses = response[split_by == s]
         s_size = responses.shape[0]
+        qs[0] = q
+        qs[1] = q
 
         # don't calculate pdf for first trial but still update q
         if feedbacks[0] > qs[responses[0]]:
