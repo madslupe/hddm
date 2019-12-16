@@ -16,4 +16,5 @@ __all__ = ['AccumulatorModel',
            'HDDMTransformed',
            'HDDMrl',
            'Hrl',
+           'HDDMaxcpt',
 ]
