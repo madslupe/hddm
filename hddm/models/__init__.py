@@ -6,6 +6,7 @@ from .hddm_stimcoding import HDDMStimCoding
 from .hddm_regression import HDDMRegressor
 from .hddm_rl import HDDMrl
 from .rl import Hrl
+from .hddm_axcpt import HDDMaxcpt
 
 __all__ = ['AccumulatorModel',
            'HDDMBase',
