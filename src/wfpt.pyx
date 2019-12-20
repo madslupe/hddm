@@ -78,6 +78,7 @@ def wiener_like_axcpt(np.ndarray[double, ndim=1] x,
                       np.ndarray[long, ndim=1] response,
                       np.ndarray[double, ndim=1] feedback,
                       np.ndarray[long, ndim=1] split_by,
+                      np.ndarray[long, ndim=1] ay,
                       double q, double alpha, double pos_alpha, double v, 
                       double sv, double a, double z, double sz, double t,
                       double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
@@ -91,9 +92,10 @@ def wiener_like_axcpt(np.ndarray[double, ndim=1] x,
     cdef double wp_outlier = w_outlier * p_outlier
     cdef double alfa
     cdef double pos_alfa
-    cdef np.ndarray[double, ndim=1] qs = np.array([q])
+    cdef double qs = q
     cdef np.ndarray[double, ndim=1] xs
     cdef np.ndarray[double, ndim=1] feedbacks
+    cdef np.ndarray[long, ndim=1] ays
     cdef np.ndarray[long, ndim=1] responses
     cdef np.ndarray[long, ndim=1] unique = np.unique(split_by)
 
@@ -111,6 +113,7 @@ def wiener_like_axcpt(np.ndarray[double, ndim=1] x,
         # select trials for current condition, identified by the split_by-array
         feedbacks = feedback[split_by == s]
         responses = response[split_by == s]
+        ays = ay[split_by == s]
         xs = x[split_by == s]
         s_size = xs.shape[0]
         qs = q
@@ -127,7 +130,7 @@ def wiener_like_axcpt(np.ndarray[double, ndim=1] x,
 
         # loop through all trials in current condition
         for i in range(1, s_size):
-            p = full_pdf(xs[i], v, sv, a, qs,
+            p = full_pdf(xs[i], ay[i] * v, sv, a, qs,
                          sz, t, st, err, n_st, n_sz, use_adaptive, simps_err)
             # If one probability = 0, the log sum will be -Inf
             p = p * (1 - p_outlier) + wp_outlier

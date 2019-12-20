@@ -55,7 +55,7 @@ class HDDMaxcpt(HDDM):
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-        return Knode(self.wfpt_axcpt_class, 'wfpt', observed=True, col_name=['split_by', 'feedback', 'response', 'rt', 'q_init'], **wfpt_parents)
+        return Knode(self.wfpt_axcpt_class, 'wfpt', observed=True, col_name=['split_by', 'feedback', 'response', 'rt', 'q_init','ay'], **wfpt_parents)
 
 
 def wienerAXCPT_like(x, v, alpha, pos_alpha, sv, a, z, sz, t, st, p_outlier=0):
@@ -69,5 +69,6 @@ def wienerAXCPT_like(x, v, alpha, pos_alpha, sv, a, z, sz, t, st, p_outlier=0):
     q = x['q_init'].iloc[0]
     feedback = x['feedback'].values
     split_by = x['split_by'].values
-    return wiener_like_axcpt(x['rt'].values, response, feedback, split_by, q, alpha, pos_alpha, v, sv, a, z, sz, t, st, p_outlier=p_outlier, **wp)
+    ay = x['ay'].values.astype(int)
+    return wiener_like_axcpt(x['rt'].values, response, feedback, split_by, ay, q, alpha, pos_alpha, v, sv, a, z, sz, t, st, p_outlier=p_outlier, **wp)
 WienerAXCPT = stochastic_from_dist('wienerAXCPT', wienerAXCPT_like)
