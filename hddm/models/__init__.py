@@ -6,6 +6,7 @@ from .hddm_stimcoding import HDDMStimCoding
 from .hddm_regression import HDDMRegressor
 from .hddm_rl import HDDMrl
 from .rl import Hrl
+from .rlwm import Hrlwm
 
 __all__ = ['AccumulatorModel',
            'HDDMBase',
@@ -16,4 +17,5 @@ __all__ = ['AccumulatorModel',
            'HDDMTransformed',
            'HDDMrl',
            'Hrl',
+           'Hrlwm',
 ]

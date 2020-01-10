@@ -243,7 +243,7 @@ def wiener_like_rl(np.ndarray[long, ndim=1] response,
 def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
                    np.ndarray[double, ndim=1] feedback,
                    np.ndarray[long, ndim=1] split_by,
-                   double q, double alpha, double pos_alpha, double v, double z,
+                   double n, double alpha, double v, double z, dobule rho, double phi, double epsilon, double pers, int K,
                    double err=1e-4, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                    double p_outlier=0, double w_outlier=0):
     cdef Py_ssize_t size = response.shape[0]
@@ -251,23 +251,29 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     cdef Py_ssize_t s_size
     cdef int s
     cdef double drift
+    cdef double p_rl
+    cdef double p_wm
     cdef double p
+    cdef double weight_wm
     cdef double sum_logp = 0
     cdef double wp_outlier = w_outlier * p_outlier
     cdef double alfa
     cdef double pos_alfa
-    cdef np.ndarray[double, ndim=1] qs = np.array([q, q])
+    cdef np.ndarray[double, ndim=1] qs = np.array([1/n]*n)
+    cdef np.ndarray[double, ndim=1] ws = np.array([1/n]*n)
     cdef np.ndarray[double, ndim=1] feedbacks
     cdef np.ndarray[long, ndim=1] responses
     cdef np.ndarray[long, ndim=1] unique = np.unique(split_by)
 
+    #need to change:
+    # q will have to be array that contains all stim
+    # and create another one for w
+    # initalize them according to 1/n_stims
+    # 
+
     if not p_outlier_in_range(p_outlier):
         return -np.inf
 
-    if pos_alpha==100.00:
-        pos_alfa = alpha
-    else:
-        pos_alfa = pos_alpha
         
     # unique represent # of conditions
     for j in range(unique.shape[0]):
@@ -276,34 +282,41 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         feedbacks = feedback[split_by == s]
         responses = response[split_by == s]
         s_size = responses.shape[0]
-        qs[0] = q
-        qs[1] = q
+        qs = np.array([1/n]*n)
+        ws = np.array([1/n]*n)
+
+        #overall choice policy is defined as a mixture using WM weight 
+        weight_wm = rho*(min(1,(K/n))
 
         # don't calculate pdf for first trial but still update q
-        if feedbacks[0] > qs[responses[0]]:
-            alfa = (2.718281828459**pos_alfa) / (1 + 2.718281828459**pos_alfa)
+        if feedbacks[0] == 1:
+            rl_alfa = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
+            wm_alfa = 1
         else:
-            alfa = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
+            rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
+            wm_alfa = (1-pers)*1
 
-        # qs[1] is upper bound, qs[0] is lower bound. feedbacks is reward
+        # feedbacks is reward
         # received on current trial.
         qs[responses[0]] = qs[responses[0]] + \
-            alfa * (feedbacks[0] - qs[responses[0]])
+            rl_alfa * (feedbacks[0] - qs[responses[0]])
+
+        ws[responses[0]] = ws[responses[0]] + \
+            wm_alfa * (feedbacks[0] - ws[responses[0]])
+
+        #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)
+        ws = ws + phi*((1/n)-ws)
 
         # loop through all trials in current condition
         for i in range(1, s_size):
 
-            drift = (qs[1] - qs[0]) * v
+            #calculate probabilites for the separate contributors
+            p_rl = (2.718281828459**(qs[response])/sum(2.718281828459**(qs)))
+            p_wm = (2.718281828459**(ws[response])/sum(2.718281828459**(ws)))
 
-            if drift == 0:
-                p = 0.5
-            else:
-                if responses[i] == 1:
-                    p = (2.718281828459**(-2 * z * drift) - 1) / \
-                        (2.718281828459**(-2 * drift) - 1)
-                else:
-                    p = 1 - (2.718281828459**(-2 * z * drift) - 1) / \
-                        (2.718281828459**(-2 * drift) - 1)
+            p = weight_wm * p_wm + (1-weight_wm) * p_rl 
+
+            p = (1-epsilon) * p + (epsilon * (1/n))
 
             # If one probability = 0, the log sum will be -Inf
             p = p * (1 - p_outlier) + wp_outlier
@@ -315,15 +328,22 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             # get learning rate for current trial. if pos_alpha is not in
             # include it will be same as alpha so can still use this
             # calculation:
-            if feedbacks[i] > qs[responses[i]]:
-                alfa = (2.718281828459**pos_alfa) / (1 + 2.718281828459**pos_alfa)
+            if feedbacks[i] == 1:
+                rl_alfa = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
+                wm_alfa = 1
             else:
-                alfa = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
+                rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
+                wm_alfa = (1-pers)*1
 
             # qs[1] is upper bound, qs[0] is lower bound. feedbacks is reward
             # received on current trial.
             qs[responses[i]] = qs[responses[i]] + \
-                alfa * (feedbacks[i] - qs[responses[i]])
+                rl_alfa * (feedbacks[i] - qs[responses[i]])
+            ws[responses[i]] = ws[responses[i]] + \
+                wm_alfa * (feedbacks[i] - ws[responses[i]])
+
+            #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)
+            ws = ws + phi*((1/n)-ws)
     return sum_logp
 
 def wiener_like_multi(np.ndarray[double, ndim=1] x, v, sv, a, z, sz, t, st, double err, multi=None,

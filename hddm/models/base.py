@@ -367,6 +367,28 @@ class AccumulatorModel(kabuki.Hierarchical):
 
         return knodes
 
+    def _create_family_categorical(self, name, value=1, g_theta = None)
+
+        if g_theta is None:
+        g_theta = value
+
+        knodes = OrderedDict()
+
+        if self.is_group_model and name not in self.group_only_nodes:
+            g = Knode(pm.Dirichlet, '%s' % name, theta=g_theta,
+                          value=value, depends=self.depends[name])
+            subj = Knode(pm.Categorical, '%s_subj' % name, p = g,
+                          value=value, depends=('subj_idx',),
+                          subj=True, plot=self.plot_subjs)
+            knodes['%s'%name] = g
+            knodes['%s_bottom'%name] = subj
+        else:
+            subj = Knode(pm.Categorical, name, p=g_theta,
+                         value=value, depends=self.depends[name])
+
+            knodes['%s_bottom'%name] = subj
+
+        return knodes
 
     def _create_family_trunc_normal(self, name, value=0, lower=None,
                                    upper=None, std_lower=1e-10,
