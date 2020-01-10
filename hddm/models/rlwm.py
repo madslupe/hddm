@@ -67,7 +67,7 @@ class Hrlwm(HDDM):
                     'pers', value=.5, g_tau=0.5**-2, std_std=0.05))
             if self.K:
                 knodes.update(self._create_family_categorical(
-                    'K', value=1))
+                    'K', value=1, g_theta = np.array(1,1,1,1,1,1)))
 
         return knodes
 

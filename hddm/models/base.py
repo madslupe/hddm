@@ -374,6 +374,8 @@ class AccumulatorModel(kabuki.Hierarchical):
 
         knodes = OrderedDict()
 
+        #a categorical parameter estimates probabilities of 
+
         if self.is_group_model and name not in self.group_only_nodes:
             g = Knode(pm.Dirichlet, '%s' % name, theta=g_theta,
                           value=value, depends=self.depends[name])
