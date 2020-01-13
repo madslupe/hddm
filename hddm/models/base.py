@@ -367,7 +367,7 @@ class AccumulatorModel(kabuki.Hierarchical):
 
         return knodes
 
-    def _create_family_categorical(self, name, value=1, g_theta = None)
+    def _create_family_categorical(self, name, value=1, g_theta = None):
 
         if g_theta is None:
         g_theta = value
