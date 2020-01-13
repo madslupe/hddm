@@ -370,7 +370,7 @@ class AccumulatorModel(kabuki.Hierarchical):
     def _create_family_categorical(self, name, value=1, g_theta = None):
 
         if g_theta is None:
-        g_theta = value
+            g_theta = value
 
         knodes = OrderedDict()
 
