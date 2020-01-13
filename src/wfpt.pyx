@@ -243,7 +243,7 @@ def wiener_like_rl(np.ndarray[long, ndim=1] response,
 def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
                    np.ndarray[double, ndim=1] feedback,
                    np.ndarray[long, ndim=1] split_by,
-                   double n, double alpha, double v, double z, dobule rho, double phi, double epsilon, double pers, int K,
+                   double n, double alpha, double v, double z, double rho, double phi, double epsilon, double pers, int K,
                    double err=1e-4, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                    double p_outlier=0, double w_outlier=0):
     cdef Py_ssize_t size = response.shape[0]
