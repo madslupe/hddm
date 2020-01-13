@@ -286,7 +286,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         ws = np.array([1/n]*n)
 
         #overall choice policy is defined as a mixture using WM weight 
-        weight_wm = rho*(min(1,(K/n))
+        weight_wm = rho*(min(1,(K/n)))
 
         # don't calculate pdf for first trial but still update q
         if feedbacks[0] == 1.0:
