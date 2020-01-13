@@ -289,7 +289,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         weight_wm = rho*(min(1,(K/n))
 
         # don't calculate pdf for first trial but still update q
-        if feedbacks[0] == 1:
+        if feedbacks[0] == 1.0:
             rl_alfa = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
             wm_alfa = 1
         else:
@@ -328,7 +328,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             # get learning rate for current trial. if pos_alpha is not in
             # include it will be same as alpha so can still use this
             # calculation:
-            if feedbacks[i] == 1:
+            if feedbacks[i] == 1.0:
                 rl_alfa = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
                 wm_alfa = 1
             else:
