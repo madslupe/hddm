@@ -262,11 +262,11 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     cdef double alfa
     cdef double pos_alfa
     cdef double prob 
-    cdef double ns 
+    cdef int ns 
     print('here')
     cdef np.ndarray[double, ndim=1] qs #= np.array([prob]*n[0]) #np.array([prob,prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
     cdef np.ndarray[double, ndim=1] ws #= np.array([prob]*n[0]) # 
-    print('but not here')
+    print('but not here?')
     cdef np.ndarray[double, ndim=1] feedbacks
     cdef np.ndarray[long, ndim=1] responses
     cdef np.ndarray[long, ndim=1] unique = np.unique(split_by)
