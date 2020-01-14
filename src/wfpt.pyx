@@ -243,6 +243,7 @@ def wiener_like_rl(np.ndarray[long, ndim=1] response,
 def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
                    np.ndarray[double, ndim=1] feedback,
                    np.ndarray[long, ndim=1] split_by,
+                   np.ndarray[long, ndim=1] stim,
                    np.ndarray[long, ndim=1] n, 
                    double alpha, double v, double z, double rho, double phi, double epsilon, double pers, int K,
                    double err=1e-4, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
@@ -265,11 +266,12 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     cdef double nsd
     cdef int ns 
     #print('here')
-    cdef np.ndarray[double, ndim=1] qs #= np.array([prob]*n[0]) #np.array([prob,prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
-    cdef np.ndarray[double, ndim=1] ws #= np.array([prob]*n[0]) # 
+    cdef np.ndarray[double, ndim=2] qs #= np.array([prob]*n[0]) #np.array([prob,prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
+    cdef np.ndarray[double, ndim=2] ws #= np.array([prob]*n[0]) # 
     #print('but not here?')
     cdef np.ndarray[double, ndim=1] feedbacks
     cdef np.ndarray[long, ndim=1] responses
+    cdef np.ndarray[long, ndim=1] stims
     cdef np.ndarray[long, ndim=1] unique = np.unique(split_by)
 
     #need to change:
@@ -296,10 +298,11 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         # select trials for current condition, identified by the split_by-array
         feedbacks = feedback[split_by == s]
         responses = response[split_by == s]
+        stims = stim[split_by == s]
         s_size = responses.shape[0]
         #print('maybe local array is the problem')
-        qs = np.array([prob]*ns)
-        ws = np.array([prob]*ns)
+        qs = np.tile(np.array([prob]), (3, ns)) #np.array([prob]*ns)
+        ws = np.tile(np.array([prob]), (3, ns)) #np.array([prob]*ns)
 
         print('qs: ', qs)
         print('ws: ', ws)
@@ -320,11 +323,11 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         print('wm_alfa : ', wm_alfa)
         # feedbacks is reward
         # received on current trial.
-        qs[responses[0]] = qs[responses[0]] + \
-            rl_alfa * (feedbacks[0] - qs[responses[0]])
+        qs[responses[0],stims[0]] = qs[responses[0],stims[0]] + \
+            rl_alfa * (feedbacks[0] - qs[responses[0],stims[0]])
 
-        ws[responses[0]] = ws[responses[0]] + \
-            wm_alfa * (feedbacks[0] - ws[responses[0]])
+        ws[responses[0],stims[0]] = ws[responses[0],stims[0]] + \
+            wm_alfa * (feedbacks[0] - ws[responses[0],stims[0]])
 
         print('qs: ', qs)
         print('ws: ', ws)
@@ -334,8 +337,8 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         # loop through all trials in current condition
         for i in range(1, s_size):
             #calculate probabilites for the separate contributors
-            p_rl = (2.718281828459**(qs[responses[i]])/sum(2.718281828459**(qs)))
-            p_wm = (2.718281828459**(ws[responses[i]])/sum(2.718281828459**(ws)))
+            p_rl = (2.718281828459**(qs[responses[i],stims[i]])/sum(2.718281828459**(qs[:,stims[i]])))
+            p_wm = (2.718281828459**(ws[responses[i],stims[i]])/sum(2.718281828459**(ws[:,stims[i]])))
             print('p_rl :', p_rl)
             print('p_wm :', p_wm)
             p = weight_wm * p_wm + (1-weight_wm) * p_rl 
@@ -361,10 +364,10 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             #print('5')   
             # qs[1] is upper bound, qs[0] is lower bound. feedbacks is reward
             # received on current trial.
-            qs[responses[i]] = qs[responses[i]] + \
-                rl_alfa * (feedbacks[i] - qs[responses[i]])
-            ws[responses[i]] = ws[responses[i]] + \
-                wm_alfa * (feedbacks[i] - ws[responses[i]])
+            qs[responses[i],stims[i]] = qs[responses[i],stims[i]] + \
+                rl_alfa * (feedbacks[i] - qs[responses[i],stims[i]])
+            ws[responses[i],stims[i]] = ws[responses[i]] + \
+                wm_alfa * (feedbacks[i] - ws[responses[i],stims[i]])
 
             print('ws before decay: ', ws)
             #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)

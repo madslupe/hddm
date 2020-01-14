@@ -86,7 +86,7 @@ class Hrlwm(HDDM):
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-        return Knode(self.rlwm_class, 'wfpt', observed=True, col_name=['split_by', 'feedback', 'response', 'n_stim'], **wfpt_parents)
+        return Knode(self.rlwm_class, 'wfpt', observed=True, col_name=['split_by', 'feedback', 'response', 'n_stim','stim'], **wfpt_parents)
 
 
 def RLWM_like(x, v, alpha, rho, phi, epsilon, pers, K, z=0.5, p_outlier=0):
@@ -101,6 +101,7 @@ def RLWM_like(x, v, alpha, rho, phi, epsilon, pers, K, z=0.5, p_outlier=0):
     n = x['n_stim'].values
     feedback = x['feedback'].values
     split_by = x['split_by'].values
+    stim = x['stim'].values
     #print('response: ', response, 'n: ', n, 'feedback: ', feedback, 'split_by: ', split_by, 'alpha: ', alpha, 'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
-    return wiener_like_rlwm(response, feedback, split_by, n, alpha, v, z, rho, phi, epsilon, pers, K, p_outlier=p_outlier, **wp)
+    return wiener_like_rlwm(response, feedback, split_by, stim, n, alpha, v, z, rho, phi, epsilon, pers, K, p_outlier=p_outlier, **wp)
 RLWM = stochastic_from_dist('RLWM', RLWM_like)
