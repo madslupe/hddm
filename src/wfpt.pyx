@@ -262,6 +262,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     cdef double alfa
     cdef double pos_alfa
     cdef double prob 
+    cdef double nsd
     cdef int ns 
     #print('here')
     cdef np.ndarray[double, ndim=1] qs #= np.array([prob]*n[0]) #np.array([prob,prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
@@ -287,8 +288,10 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     for j in range(unique.shape[0]):
         s = unique[j]
         ns = n[split_by == s][0]
+        nsd = ns
         print('ns: ', ns)
-        prob = 1/ns
+        print('ns: ', nsdouble)
+        prob = 1/nsd
         print('prob :', prob)
         # select trials for current condition, identified by the split_by-array
         feedbacks = feedback[split_by == s]
@@ -302,7 +305,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         print('ws: ', ws)
 
         #overall choice policy is defined as a mixture using WM weight 
-        weight_wm = rho*(min(1,(K/ns)))
+        weight_wm = rho*(min(1,(K/nsd)))
 
         print('weight_wm : ', weight_wm)
 
