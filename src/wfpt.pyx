@@ -247,7 +247,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
                    double alpha, double v, double z, double rho, double phi, double epsilon, double pers, int K,
                    double err=1e-4, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                    double p_outlier=0, double w_outlier=0):
-    print('heiehe')
+    #print('heiehe')
     cdef Py_ssize_t size = response.shape[0]
     cdef Py_ssize_t i, j
     cdef Py_ssize_t s_size
@@ -263,10 +263,10 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     cdef double pos_alfa
     cdef double prob 
     cdef int ns 
-    print('here')
+    #print('here')
     cdef np.ndarray[double, ndim=1] qs #= np.array([prob]*n[0]) #np.array([prob,prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
     cdef np.ndarray[double, ndim=1] ws #= np.array([prob]*n[0]) # 
-    print('but not here?')
+    #print('but not here?')
     cdef np.ndarray[double, ndim=1] feedbacks
     cdef np.ndarray[long, ndim=1] responses
     cdef np.ndarray[long, ndim=1] unique = np.unique(split_by)
@@ -277,7 +277,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     # initalize them according to 1/n_stims
     # 
 
-    print('inside... alpha: ', alpha,'n: ', n,  'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
+    #print('inside... alpha: ', alpha,'n: ', n,  'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
 
     if not p_outlier_in_range(p_outlier):
         return -np.inf
@@ -287,23 +287,23 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     for j in range(unique.shape[0]):
         s = unique[j]
         ns = n[split_by == s][0]
-        print('ns: ', ns)
+        #print('ns: ', ns)
         prob = 1/ns
         # select trials for current condition, identified by the split_by-array
         feedbacks = feedback[split_by == s]
         responses = response[split_by == s]
         s_size = responses.shape[0]
-        print('maybe local array is the problem')
+        #print('maybe local array is the problem')
         qs = np.array([prob]*ns)
         ws = np.array([prob]*ns)
 
         print('qs: ', qs)
-        print('1')
+        print('ws: ', ws)
 
         #overall choice policy is defined as a mixture using WM weight 
         weight_wm = rho*(min(1,(K/ns)))
 
-        print('1.5')
+        print('weight_wm : ', weight_wm)
 
         # don't calculate pdf for first trial but still update q
         if feedbacks[0] == 1.0:
@@ -313,7 +313,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
             wm_alfa = (1-pers)*1
 
-        print('2')
+        print('wm_alfa : ', wm_alfa)
         # feedbacks is reward
         # received on current trial.
         qs[responses[0]] = qs[responses[0]] + \
@@ -328,15 +328,14 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
 
         # loop through all trials in current condition
         for i in range(1, s_size):
-            print('4')
             #calculate probabilites for the separate contributors
             p_rl = (2.718281828459**(qs[responses[i]])/sum(2.718281828459**(qs)))
             p_wm = (2.718281828459**(ws[responses[i]])/sum(2.718281828459**(ws)))
-
+            print('p_rl :', p_rl)
             p = weight_wm * p_wm + (1-weight_wm) * p_rl 
 
             p = (1-epsilon) * p + (epsilon * (1/ns))
-
+            print('p :', p)
             # If one probability = 0, the log sum will be -Inf
             p = p * (1 - p_outlier) + wp_outlier
             if p == 0:
@@ -353,7 +352,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             else:
                 rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
                 wm_alfa = (1-pers)*1
-            print('5')   
+            #print('5')   
             # qs[1] is upper bound, qs[0] is lower bound. feedbacks is reward
             # received on current trial.
             qs[responses[i]] = qs[responses[i]] + \
