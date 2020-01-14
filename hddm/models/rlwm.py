@@ -67,7 +67,7 @@ class Hrlwm(HDDM):
                     'pers', value=.5, g_tau=0.5**-2, std_std=0.05))
             if self.K:
                 knodes.update(self._create_family_categorical(
-                    'K', value=np.array([1,1,1,1,1,1]), g_theta = np.array([1,1,1,1,1,1])))
+                    'K', value=np.array([1,1,1,1,1,1]), g_theta = np.array([1/6,1/6,1/6,1/6,1/6,1/6])))
 
         return knodes
 
@@ -101,5 +101,6 @@ def RLWM_like(x, v, alpha, rho, phi, epsilon, pers, K, z=0.5, p_outlier=0):
     n = x['n_stim'].iloc[0]
     feedback = x['feedback'].values
     split_by = x['split_by'].values
+    print('alpha: ', alpha, 'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
     return wiener_like_rlwm(response, feedback, split_by, n, alpha, v, z, rho, phi, epsilon, pers, K, p_outlier=p_outlier, **wp)
 RLWM = stochastic_from_dist('RLWM', RLWM_like)
