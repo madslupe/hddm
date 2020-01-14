@@ -290,7 +290,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         ns = n[split_by == s][0]
         nsd = ns
         print('ns: ', ns)
-        print('ns: ', nsdouble)
+        print('ns: ', nsd)
         prob = 1/nsd
         print('prob :', prob)
         # select trials for current condition, identified by the split_by-array
