@@ -290,7 +290,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         ns = n[split_by == s][0]
         nsd = ns
         print('ns: ', ns)
-        print('ns: ', nsd)
+        print('nsd: ', nsd)
         prob = 1/nsd
         print('prob :', prob)
         # select trials for current condition, identified by the split_by-array
@@ -316,7 +316,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         else:
             rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
             wm_alfa = (1-pers)*1
-
+        print('rl_alfa : ', rl_alfa)   
         print('wm_alfa : ', wm_alfa)
         # feedbacks is reward
         # received on current trial.
@@ -326,19 +326,21 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         ws[responses[0]] = ws[responses[0]] + \
             wm_alfa * (feedbacks[0] - ws[responses[0]])
 
-        print('3')
+        print('qs: ', qs)
+        print('ws: ', ws)
         #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)
-        ws = ws + phi*((1/ns)-ws)
-
+        ws = ws + phi*(prob-ws)
+        print('ws: ', ws)
         # loop through all trials in current condition
         for i in range(1, s_size):
             #calculate probabilites for the separate contributors
             p_rl = (2.718281828459**(qs[responses[i]])/sum(2.718281828459**(qs)))
             p_wm = (2.718281828459**(ws[responses[i]])/sum(2.718281828459**(ws)))
             print('p_rl :', p_rl)
+            print('p_wm :', p_wm)
             p = weight_wm * p_wm + (1-weight_wm) * p_rl 
 
-            p = (1-epsilon) * p + (epsilon * (1/ns))
+            p = (1-epsilon) * p + (epsilon * (prob))
             print('p :', p)
             # If one probability = 0, the log sum will be -Inf
             p = p * (1 - p_outlier) + wp_outlier
@@ -366,7 +368,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
 
             print('ws before decay: ', ws)
             #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)
-            ws = ws + phi*((1/ns)-ws)
+            ws = ws + phi*((1/nsd)-ws)
             print('ws after decay: ', ws)
     return sum_logp
 
