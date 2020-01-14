@@ -260,8 +260,9 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     cdef double wp_outlier = w_outlier * p_outlier
     cdef double alfa
     cdef double pos_alfa
-    cdef np.ndarray[double, ndim=1] qs = np.array([1/n]*n)
-    cdef np.ndarray[double, ndim=1] ws = np.array([1/n]*n)
+    cdef double prob = 1.0/6.0
+    cdef np.ndarray[double, ndim=1] qs = np.array([prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
+    cdef np.ndarray[double, ndim=1] ws = np.array([prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
     cdef np.ndarray[double, ndim=1] feedbacks
     cdef np.ndarray[long, ndim=1] responses
     cdef np.ndarray[long, ndim=1] unique = np.unique(split_by)
