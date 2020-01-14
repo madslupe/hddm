@@ -287,8 +287,9 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     for j in range(unique.shape[0]):
         s = unique[j]
         ns = n[split_by == s][0]
-        #print('ns: ', ns)
+        print('ns: ', ns)
         prob = 1/ns
+        print('prob :', prob)
         # select trials for current condition, identified by the split_by-array
         feedbacks = feedback[split_by == s]
         responses = response[split_by == s]
@@ -360,8 +361,10 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             ws[responses[i]] = ws[responses[i]] + \
                 wm_alfa * (feedbacks[i] - ws[responses[i]])
 
+            print('ws before decay: ', ws)
             #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)
             ws = ws + phi*((1/ns)-ws)
+            print('ws after decay: ', ws)
     return sum_logp
 
 def wiener_like_multi(np.ndarray[double, ndim=1] x, v, sv, a, z, sz, t, st, double err, multi=None,
