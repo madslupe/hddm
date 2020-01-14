@@ -311,8 +311,8 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         for i in range(1, s_size):
 
             #calculate probabilites for the separate contributors
-            p_rl = (2.718281828459**(qs[response])/sum(2.718281828459**(qs)))
-            p_wm = (2.718281828459**(ws[response])/sum(2.718281828459**(ws)))
+            p_rl = (2.718281828459**(qs[responses[i]])/sum(2.718281828459**(qs)))
+            p_wm = (2.718281828459**(ws[responses[i]])/sum(2.718281828459**(ws)))
 
             p = weight_wm * p_wm + (1-weight_wm) * p_rl 
 
