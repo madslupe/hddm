@@ -98,7 +98,7 @@ def RLWM_like(x, v, alpha, rho, phi, epsilon, pers, K, z=0.5, p_outlier=0):
     sum_logp = 0
     wp = wiener_params
     response = x['response'].values.astype(int)
-    n = x['n_stim'].iloc[0].astype(int)
+    n = x['n_stim'].values
     feedback = x['feedback'].values
     split_by = x['split_by'].values
     print('response: ', response, 'n: ', n, 'feedback: ', feedback, 'split_by: ', split_by, 'alpha: ', alpha, 'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)

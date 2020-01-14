@@ -243,7 +243,8 @@ def wiener_like_rl(np.ndarray[long, ndim=1] response,
 def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
                    np.ndarray[double, ndim=1] feedback,
                    np.ndarray[long, ndim=1] split_by,
-                   int n, double alpha, double v, double z, double rho, double phi, double epsilon, double pers, int K,
+                   np.ndarray[long, ndim=1] n, 
+                   double alpha, double v, double z, double rho, double phi, double epsilon, double pers, int K,
                    double err=1e-4, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                    double p_outlier=0, double w_outlier=0):
     print('heiehe')
@@ -260,10 +261,11 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     cdef double wp_outlier = w_outlier * p_outlier
     cdef double alfa
     cdef double pos_alfa
-    cdef double prob = 1.0/6.0
+    cdef double prob = 1/6 
+    cdef double ns 
     print('here')
-    cdef np.ndarray[double, ndim=1] qs = np.array([prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
-    cdef np.ndarray[double, ndim=1] ws = np.array([prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
+    cdef np.ndarray[double, ndim=1] qs #= np.array([prob]*n[0]) #np.array([prob,prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
+    cdef np.ndarray[double, ndim=1] ws #= np.array([prob]*n[0]) # 
     print('but not here')
     cdef np.ndarray[double, ndim=1] feedbacks
     cdef np.ndarray[long, ndim=1] responses
@@ -284,12 +286,14 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     # unique represent # of conditions
     for j in range(unique.shape[0]):
         s = unique[j]
+        #ns = unique[n][0]
         # select trials for current condition, identified by the split_by-array
         feedbacks = feedback[split_by == s]
         responses = response[split_by == s]
         s_size = responses.shape[0]
-        qs = np.array([1/n]*n)
-        ws = np.array([1/n]*n)
+        print('maybe local array is the problem')
+        qs = np.array([prob]*n)
+        ws = np.array([prob]*n)
 
         print('1')
 
