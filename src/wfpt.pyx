@@ -271,6 +271,8 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     # initalize them according to 1/n_stims
     # 
 
+    print('inside... alpha: ', alpha, 'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
+
     if not p_outlier_in_range(p_outlier):
         return -np.inf
 
@@ -285,6 +287,8 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         qs = np.array([1/n]*n)
         ws = np.array([1/n]*n)
 
+        print('1')
+
         #overall choice policy is defined as a mixture using WM weight 
         weight_wm = rho*(min(1,(K/n)))
 
@@ -296,6 +300,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
             wm_alfa = (1-pers)*1
 
+        print('2')
         # feedbacks is reward
         # received on current trial.
         qs[responses[0]] = qs[responses[0]] + \
@@ -304,12 +309,13 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         ws[responses[0]] = ws[responses[0]] + \
             wm_alfa * (feedbacks[0] - ws[responses[0]])
 
+        print('3')
         #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)
         ws = ws + phi*((1/n)-ws)
 
         # loop through all trials in current condition
         for i in range(1, s_size):
-
+            print('4')
             #calculate probabilites for the separate contributors
             p_rl = (2.718281828459**(qs[responses[i]])/sum(2.718281828459**(qs)))
             p_wm = (2.718281828459**(ws[responses[i]])/sum(2.718281828459**(ws)))
@@ -334,7 +340,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             else:
                 rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
                 wm_alfa = (1-pers)*1
-
+            print('5')   
             # qs[1] is upper bound, qs[0] is lower bound. feedbacks is reward
             # received on current trial.
             qs[responses[i]] = qs[responses[i]] + \
