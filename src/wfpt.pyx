@@ -246,6 +246,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
                    int n, double alpha, double v, double z, double rho, double phi, double epsilon, double pers, int K,
                    double err=1e-4, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                    double p_outlier=0, double w_outlier=0):
+    print('heiehe')
     cdef Py_ssize_t size = response.shape[0]
     cdef Py_ssize_t i, j
     cdef Py_ssize_t s_size
@@ -271,7 +272,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     # initalize them according to 1/n_stims
     # 
 
-    print('inside... alpha: ', alpha, 'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
+    print('inside... alpha: ', alpha,'n: ', n,  'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
 
     if not p_outlier_in_range(p_outlier):
         return -np.inf
