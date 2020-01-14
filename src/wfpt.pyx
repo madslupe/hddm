@@ -361,12 +361,13 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             else:
                 rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
                 wm_alfa = (1-pers)*1
-            #print('5')   
-            # qs[1] is upper bound, qs[0] is lower bound. feedbacks is reward
+            print('5')   
+            # feedbacks is reward
             # received on current trial.
             qs[responses[i],stims[i]] = qs[responses[i],stims[i]] + \
                 rl_alfa * (feedbacks[i] - qs[responses[i],stims[i]])
-            ws[responses[i],stims[i]] = ws[responses[i]] + \
+
+            ws[responses[i],stims[i]] = ws[responses[i],stims[i]] + \
                 wm_alfa * (feedbacks[i] - ws[responses[i],stims[i]])
 
             print('ws before decay: ', ws)
