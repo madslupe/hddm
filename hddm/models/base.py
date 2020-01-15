@@ -369,7 +369,7 @@ class AccumulatorModel(kabuki.Hierarchical):
 
     def _create_family_categorical(self, name, value=1, g_theta = None):
 
-        value = np.array([1/6,1/6,1/6,1/6,1/6,1/6])
+        #value = np.array([1/6,1/6,1/6,1/6,1/6])
 
         if g_theta is None:
             g_theta = value

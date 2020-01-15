@@ -28,7 +28,7 @@ class Hrlwm(HDDM):
         self.phi = kwargs.pop('phi', True)
         self.epsilon = kwargs.pop('epsilon', True)
         self.pers = kwargs.pop('pers', True)
-        self.K = kwargs.pop('K', True)
+        #self.K = kwargs.pop('K', True)
         self.z = kwargs.pop('z', False)
         self.rlwm_class = RLWM
 
@@ -65,9 +65,9 @@ class Hrlwm(HDDM):
             if self.pers:
                 knodes.update(self._create_family_invlogit(
                     'pers', value=.5, g_tau=0.5**-2, std_std=0.05))
-            if self.K:
-                knodes.update(self._create_family_categorical(
-                    'K', value=1, g_theta = np.array([1/6,1/6,1/6,1/6,1/6,1/6])))
+            #if self.K:
+            #    knodes.update(self._create_family_categorical(
+            #        'K', value=1, g_theta = np.array([1/6,1/6,1/6,1/6,1/6,1/6])))
 
         return knodes
 
@@ -79,7 +79,7 @@ class Hrlwm(HDDM):
         wfpt_parents['phi'] = knodes['phi_bottom']
         wfpt_parents['epsilon'] = knodes['epsilon_bottom']
         wfpt_parents['pers'] = knodes['pers_bottom']
-        wfpt_parents['K'] = knodes['K_bottom']
+        #wfpt_parents['K'] = knodes['K_bottom']
         wfpt_parents['z'] = knodes['z_bottom'] if 'z' in self.include else 0.5
 
         return wfpt_parents
@@ -89,7 +89,7 @@ class Hrlwm(HDDM):
         return Knode(self.rlwm_class, 'wfpt', observed=True, col_name=['split_by', 'feedback', 'response', 'n_stim','stim'], **wfpt_parents)
 
 
-def RLWM_like(x, v, alpha, rho, phi, epsilon, pers, K, z=0.5, p_outlier=0):
+def RLWM_like(x, v, alpha, rho, phi, epsilon, pers, z=0.5, p_outlier=0): #put in K here when it works with dirichlet/categorical
 
     wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
                      'use_adaptive': 1,
@@ -102,6 +102,7 @@ def RLWM_like(x, v, alpha, rho, phi, epsilon, pers, K, z=0.5, p_outlier=0):
     feedback = x['feedback'].values
     split_by = x['split_by'].values
     stim = x['stim'].values
+    K = 3
     #print('response: ', response, 'n: ', n, 'feedback: ', feedback, 'split_by: ', split_by, 'alpha: ', alpha, 'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
     return wiener_like_rlwm(response, feedback, split_by, stim, n, alpha, v, z, rho, phi, epsilon, pers, K, p_outlier=p_outlier, **wp)
 RLWM = stochastic_from_dist('RLWM', RLWM_like)
