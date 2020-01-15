@@ -280,7 +280,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     # initalize them according to 1/n_stims
     # 
 
-    #print('inside... alpha: ', alpha,'n: ', n,  'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
+    #print('inside... alpha: ', alpha, 'n_stim: ', n_stim ,'n: ', n,  'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
 
     if not p_outlier_in_range(p_outlier):
         return -np.inf
@@ -291,10 +291,10 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         s = unique[j]
         ns = n[split_by == s][0]
         nsd = ns
-        print('ns: ', ns)
-        print('nsd: ', nsd)
+        #print('ns: ', ns)
+        #print('nsd: ', nsd)
         prob = 1/nsd
-        print('prob :', prob)
+        #print('prob :', prob)
         # select trials for current condition, identified by the split_by-array
         feedbacks = feedback[split_by == s]
         responses = response[split_by == s]
@@ -304,13 +304,13 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         qs = np.tile(np.array([prob]), (3, ns)) #np.array([prob]*ns)
         ws = np.tile(np.array([prob]), (3, ns)) #np.array([prob]*ns)
 
-        print('qs: ', qs)
-        print('ws: ', ws)
+        #print('qs: ', qs)
+        #print('ws: ', ws)
 
         #overall choice policy is defined as a mixture using WM weight 
         weight_wm = rho*(min(1,(K/nsd)))
 
-        print('weight_wm : ', weight_wm)
+        #print('weight_wm : ', weight_wm)
 
         # don't calculate pdf for first trial but still update q
         if feedbacks[0] == 1.0:
@@ -319,8 +319,8 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         else:
             rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
             wm_alfa = (1-pers)*1
-        print('rl_alfa : ', rl_alfa)   
-        print('wm_alfa : ', wm_alfa)
+        #print('rl_alfa : ', rl_alfa)   
+        #print('wm_alfa : ', wm_alfa)
         # feedbacks is reward
         # received on current trial.
         qs[responses[0],stims[0]] = qs[responses[0],stims[0]] + \
@@ -329,22 +329,22 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         ws[responses[0],stims[0]] = ws[responses[0],stims[0]] + \
             wm_alfa * (feedbacks[0] - ws[responses[0],stims[0]])
 
-        print('qs: ', qs)
-        print('ws: ', ws)
+        #print('qs: ', qs)
+        #print('ws: ', ws)
         #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)
         ws = ws + phi*(prob-ws)
-        print('ws: ', ws)
+        #print('ws: ', ws)
         # loop through all trials in current condition
         for i in range(1, s_size):
             #calculate probabilites for the separate contributors
             p_rl = (2.718281828459**(qs[responses[i],stims[i]])/sum(2.718281828459**(qs[:,stims[i]])))
             p_wm = (2.718281828459**(ws[responses[i],stims[i]])/sum(2.718281828459**(ws[:,stims[i]])))
-            print('p_rl :', p_rl)
-            print('p_wm :', p_wm)
+            #print('p_rl :', p_rl)
+            #print('p_wm :', p_wm)
             p = weight_wm * p_wm + (1-weight_wm) * p_rl 
 
             p = (1-epsilon) * p + (epsilon * (prob))
-            print('p :', p)
+            #print('p :', p)
             # If one probability = 0, the log sum will be -Inf
             p = p * (1 - p_outlier) + wp_outlier
             if p == 0:
@@ -361,7 +361,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             else:
                 rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
                 wm_alfa = (1-pers)*1
-            print('5')   
+            #print('5')   
             # feedbacks is reward
             # received on current trial.
             qs[responses[i],stims[i]] = qs[responses[i],stims[i]] + \
@@ -370,10 +370,10 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
             ws[responses[i],stims[i]] = ws[responses[i],stims[i]] + \
                 wm_alfa * (feedbacks[i] - ws[responses[i],stims[i]])
 
-            print('ws before decay: ', ws)
+            #print('ws before decay: ', ws)
             #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)
             ws = ws + phi*((1/nsd)-ws)
-            print('ws after decay: ', ws)
+            #print('ws after decay: ', ws)
     return sum_logp
 
 def wiener_like_multi(np.ndarray[double, ndim=1] x, v, sv, a, z, sz, t, st, double err, multi=None,
