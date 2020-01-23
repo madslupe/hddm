@@ -80,7 +80,11 @@ def wiener_like_adhd(np.ndarray[double, ndim=1] x,
                      np.ndarray[double, ndim=1] zneg,
                      np.ndarray[double, ndim=1] dmed,
                      np.ndarray[double, ndim=1] dsess,
-                     double 
+                     double b_v_zpos, double b_v_zneg, double b_v_dmed, double b_v_dsess, double b_v_zpos_dmed, double b_v_zneg_dmed, 
+                     double b_v_zpos_dsess, double b_v_zneg_dsess, double b_v_dmed_dsess, double b_v_zpos_dmed_dsess, double b_v_zneg_dmed_dsess, 
+                     double b_a_dmed, double b_a_dsess, double b_a_dmed_dsess, 
+                     double b_t_dmed, double b_t_dsess, double b_t_dmed_dsess, 
+                     double b_z_dmed, double b_z_dsess, double b_z_dmed_dsess,
                      double v, double sv, double a, double z, double sz, double t,
                      double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                      double p_outlier=0, double w_outlier=0):
