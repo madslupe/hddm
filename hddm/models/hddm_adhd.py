@@ -14,12 +14,11 @@ from wfpt import wiener_like_adhd
 
 
 class HDDMadhd(HDDM):
-    """HDDM model that can be used for two-armed bandit tasks.
+    """
 
     """
 
     def __init__(self, *args, **kwargs):
-        self.non_centered = kwargs.pop('non_centered', False)
         self.b_v_zpos = kwargs.pop('b_v_zpos', True)
         self.b_v_zneg = kwargs.pop('b_v_zneg', True)
         self.b_v_dmed = kwargs.pop('b_v_dmed', True)
