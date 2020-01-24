@@ -79,7 +79,6 @@ class HDDMadhd(HDDM):
             knodes['b_v_zpos_dmed_dsess_bottom'] = Knode(pymc.Normal, 'b_v_zpos_dmed_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_v_zpos_dmed_dsess'])
         if self.b_v_zneg_dmed_dsess:
             knodes['b_v_zneg_dmed_dsess_bottom'] = Knode(pymc.Normal, 'b_v_zneg_dmed_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_v_zneg_dmed_dsess'])
-
         if self.b_a_dmed:
             knodes.update(self._create_family_normal(
                     'b_a_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
@@ -88,8 +87,6 @@ class HDDMadhd(HDDM):
                     'b_a_dsess', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
         if self.b_a_dmed_dsess:
             knodes['b_a_dmed_dsess_bottom'] = Knode(pymc.Normal, 'b_a_dmed_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_a_dmed_dsess'])
-
-
         if self.b_t_dmed:
             knodes.update(self._create_family_normal(
                     'b_t_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
@@ -98,8 +95,6 @@ class HDDMadhd(HDDM):
                     'b_t_dsess', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
         if self.b_t_dmed_dsess:
             knodes['b_t_dmed_dsess_bottom'] = Knode(pymc.Normal, 'b_t_dmed_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_t_dmed_dsess'])
-
-
         if self.b_z_dmed:
             knodes.update(self._create_family_normal(
                     'b_z_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
@@ -108,7 +103,6 @@ class HDDMadhd(HDDM):
                     'b_z_dsess', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
         if self.b_z_dmed_dsess:
             knodes['b_z_dmed_dsess_bottom'] = Knode(pymc.Normal, 'b_z_dmed_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_z_dmed_dsess'])
-
         return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
@@ -124,19 +118,15 @@ class HDDMadhd(HDDM):
         wfpt_parents['b_v_dmed_dsess'] = knodes['b_v_dmed_dsess_bottom']
         wfpt_parents['b_v_zpos_dmed_dsess'] = knodes['b_v_zpos_dmed_dsess_bottom']
         wfpt_parents['b_v_zneg_dmed_dsess'] = knodes['b_v_zneg_dmed_dsess_bottom']
-
         wfpt_parents['b_a_dmed'] = knodes['b_a_dmed_bottom']
         wfpt_parents['b_a_dsess'] = knodes['b_a_dsess_bottom']
         wfpt_parents['b_a_dmed_dsess'] = knodes['b_a_dmed_dsess_bottom']
-
         wfpt_parents['b_t_dmed'] = knodes['b_t_dmed_bottom']
         wfpt_parents['b_t_dsess'] = knodes['b_t_dsess_bottom']
         wfpt_parents['b_t_dmed_dsess'] = knodes['b_t_dmed_dsess_bottom']
-
         wfpt_parents['b_z_dmed'] = knodes['b_z_dmed_bottom']
         wfpt_parents['b_z_dsess'] = knodes['b_z_dsess_bottom']
         wfpt_parents['b_z_dmed_dsess'] = knodes['b_z_dmed_dsess_bottom']
-
         return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):
