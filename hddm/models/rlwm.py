@@ -134,7 +134,7 @@ class Hrlwm(HDDM):
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = self._create_wfpt_parents_dict(knodes)
-        return Knode(self.rlwm_class, 'wfpt', observed=True, col_name=['split_by', 'feedback', 'response', 'n_stim','stim'], **wfpt_parents)
+        return Knode(self.rlwm_class, 'wfpt', observed=True, col_name=['rt', 'zpos','zneg','dmed','dsess'], **wfpt_parents)
 
 
 def RLWM_like(x, b_v_zpos, b_v_zneg, b_v_dmed, b_v_dsess, b_v_zpos_dmed, b_v_zneg_dmed, b_v_zpos_dsess, b_v_zneg_dsess, b_v_dmed_dsess, b_v_zpos_dmed_dsess, b_v_zneg_dmed_dsess, b_a_dmed, b_a_dsess, b_a_dmed_dsess, b_t_dmed, b_t_dsess, b_t_dmed_dsess, b_z_dmed, b_z_dsess, b_z_dmed_dsess, v, sv, a, z, sz, t, st, p_outlier=0):
