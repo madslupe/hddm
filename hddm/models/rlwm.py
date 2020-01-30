@@ -35,7 +35,7 @@ class Hrlwm(HDDM):
 
     def _create_stochastic_knodes(self, include):
         #v is not estimated, try to exclude it. used to be params = ['v']
-        params = ['v']
+        params = []
         if 'p_outlier' in self.include:
             params.append('p_outlier')
         if 'z' in self.include:
@@ -73,7 +73,7 @@ class Hrlwm(HDDM):
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = OrderedDict()
-        wfpt_parents['v'] = knodes['v_bottom']
+        #wfpt_parents['v'] = knodes['v_bottom']
         wfpt_parents['alpha'] = knodes['alpha_bottom']
         wfpt_parents['rho'] = knodes['rho_bottom']
         wfpt_parents['phi'] = knodes['phi_bottom']
@@ -102,7 +102,7 @@ def RLWM_like(x, v, alpha, rho, phi, epsilon, pers, z=0.5, p_outlier=0): #put in
     feedback = x['feedback'].values
     split_by = x['split_by'].values
     stim = x['stim'].values
-    K = 5
+    #K = 5
     #print('response: ', response, 'n: ', n, 'feedback: ', feedback, 'split_by: ', split_by, 'alpha: ', alpha, 'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
-    return wiener_like_rlwm(response, feedback, split_by, stim, n, alpha, z, rho, phi, epsilon, pers, K, p_outlier=p_outlier, **wp)
+    return wiener_like_rlwm(response, feedback, split_by, stim, n, alpha, z, rho, phi, epsilon, pers, p_outlier=p_outlier, **wp)
 RLWM = stochastic_from_dist('RLWM', RLWM_like)
