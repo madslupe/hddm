@@ -240,41 +240,140 @@ def wiener_like_rl(np.ndarray[long, ndim=1] response,
                 alfa * (feedbacks[i] - qs[responses[i]])
     return sum_logp
 
-def wiener_like_rlwm(np.ndarray[double, ndim=1] x, 
-                     np.ndarray[double, ndim=1] zpos,
-                     np.ndarray[double, ndim=1] zneg,
-                     np.ndarray[double, ndim=1] dmed,
-                     np.ndarray[double, ndim=1] dsess,
-                     double b_v_zpos, double b_v_zneg, double b_v_dmed, double b_v_dsess, double b_v_zpos_dmed, double b_v_zneg_dmed, 
-                     double b_v_zpos_dsess, double b_v_zneg_dsess, double b_v_dmed_dsess, double b_v_zpos_dmed_dsess, double b_v_zneg_dmed_dsess, 
-                     double b_a_dmed, double b_a_dsess, double b_a_dmed_dsess, 
-                     double b_t_dmed, double b_t_dsess, double b_t_dmed_dsess, 
-                     double b_z_dmed, double b_z_dsess, double b_z_dmed_dsess,
-                     double v, double sv, double a, double z, double sz, double t,
-                     double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
-                     double p_outlier=0, double w_outlier=0):
-    cdef Py_ssize_t size = x.shape[0]
-    cdef Py_ssize_t i
+def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
+                   np.ndarray[double, ndim=1] feedback,
+                   np.ndarray[long, ndim=1] split_by,
+                   np.ndarray[long, ndim=1] stim,
+                   np.ndarray[long, ndim=1] n, 
+                   double alpha, double z, double rho, double phi, double epsilon, double pers, int K,
+                   double err=1e-4, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
+                   double p_outlier=0, double w_outlier=0):
+    #print('heiehe')
+    cdef Py_ssize_t size = response.shape[0]
+    cdef Py_ssize_t i, j
+    cdef Py_ssize_t s_size
+    cdef int s
+    cdef double drift
+    cdef double p_rl
+    cdef double p_wm
     cdef double p
+    cdef double weight_wm
     cdef double sum_logp = 0
     cdef double wp_outlier = w_outlier * p_outlier
+    cdef double alfa
+    cdef double pos_alfa
+    cdef double prob 
+    cdef double nsd
+    cdef int ns 
+    #print('here')
+    cdef np.ndarray[double, ndim=2] qs #= np.array([prob]*n[0]) #np.array([prob,prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
+    cdef np.ndarray[double, ndim=2] ws #= np.array([prob]*n[0]) # 
+    #print('but not here?')
+    cdef np.ndarray[double, ndim=1] feedbacks
+    cdef np.ndarray[long, ndim=1] responses
+    cdef np.ndarray[long, ndim=1] stims
+    cdef np.ndarray[long, ndim=1] unique = np.unique(split_by)
+
+    #need to change:
+    # q will have to be array that contains all stim
+    # and create another one for w
+    # initalize them according to 1/n_stims
+    # 
+
+    #print('inside... alpha: ', alpha, 'n_stim: ', n_stim ,'n: ', n,  'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
 
     if not p_outlier_in_range(p_outlier):
         return -np.inf
 
-    for i in range(size):
-        p = full_pdf(x[i], v + (zpos[i] * b_v_zpos) + (zneg[i] * b_v_zneg) + (zpos[i] * dmed[i] * b_v_zpos_dmed) + (zneg[i] * dmed[i] * b_v_zneg_dmed) + (zpos[i] * dsess[i] * b_v_zpos_dsess) + (zneg[i] * dsess[i] * b_v_zneg_dsess) + (zpos[i]*dsess[i]*dmed[i]*b_v_zpos_dmed_dsess)+ (zneg[i]*dsess[i]*dmed[i]*b_v_zneg_dmed_dsess) + (dmed[i]*b_v_dmed) + (dsess[i]*b_v_dsess) + (dsess[i]*dmed[i]*b_v_dmed_dsess), sv, 
-                     a + (dmed[i]*b_a_dmed) + (dsess[i]*b_a_dsess) + (dsess[i]*dmed[i]*b_a_dmed_dsess),
-                     z + (dmed[i]*b_z_dmed) + (dsess[i]*b_z_dsess) + (dsess[i]*dmed[i]*b_z_dmed_dsess), sz, 
-                     t + (dmed[i]*b_t_dmed) + (dsess[i]*b_t_dsess) + (dsess[i]*dmed[i]*b_t_dmed_dsess), st, err,
-                     n_st, n_sz, use_adaptive, simps_err)
-        # If one probability = 0, the log sum will be -Inf
-        p = p * (1 - p_outlier) + wp_outlier
-        if p == 0:
-            return -np.inf
+        
+    # unique represent # of conditions
+    for j in range(unique.shape[0]):
+        s = unique[j]
+        ns = n[split_by == s][0]
+        nsd = ns
+        #print('ns: ', ns)
+        #print('nsd: ', nsd)
+        prob = 1/nsd
+        #print('prob :', prob)
+        # select trials for current condition, identified by the split_by-array
+        feedbacks = feedback[split_by == s]
+        responses = response[split_by == s]
+        stims = stim[split_by == s]
+        s_size = responses.shape[0]
+        #print('maybe local array is the problem')
+        qs = np.tile(np.array([prob]), (3, ns)) #np.array([prob]*ns)
+        ws = np.tile(np.array([prob]), (3, ns)) #np.array([prob]*ns)
 
-        sum_logp += log(p)
+        #print('qs: ', qs)
+        #print('ws: ', ws)
 
+        #overall choice policy is defined as a mixture using WM weight 
+        weight_wm = rho*(min(1,(K/nsd)))
+
+        #print('weight_wm : ', weight_wm)
+
+        # don't calculate pdf for first trial but still update q
+        if feedbacks[0] == 1.0:
+            rl_alfa = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
+            wm_alfa = 1
+        else:
+            rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
+            wm_alfa = (1-pers)*1
+        #print('rl_alfa : ', rl_alfa)   
+        #print('wm_alfa : ', wm_alfa)
+        # feedbacks is reward
+        # received on current trial.
+        qs[responses[0],stims[0]] = qs[responses[0],stims[0]] + \
+            rl_alfa * (feedbacks[0] - qs[responses[0],stims[0]])
+
+        ws[responses[0],stims[0]] = ws[responses[0],stims[0]] + \
+            wm_alfa * (feedbacks[0] - ws[responses[0],stims[0]])
+
+        #print('qs: ', qs)
+        #print('ws: ', ws)
+        #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)
+        ws = ws + phi*(prob-ws)
+        #print('ws: ', ws)
+        # loop through all trials in current condition
+        for i in range(1, s_size):
+            #calculate probabilites for the separate contributors
+            p_rl = (2.718281828459**(qs[responses[i],stims[i]])/sum(2.718281828459**(qs[:,stims[i]])))
+            p_wm = (2.718281828459**(ws[responses[i],stims[i]])/sum(2.718281828459**(ws[:,stims[i]])))
+            #print('p_rl :', p_rl)
+            #print('p_wm :', p_wm)
+            p = weight_wm * p_wm + (1-weight_wm) * p_rl 
+
+            p = (1-epsilon) * p + (epsilon * (prob))
+            #print('p :', p)
+            # If one probability = 0, the log sum will be -Inf
+            p = p * (1 - p_outlier) + wp_outlier
+            if p == 0:
+                return -np.inf
+
+            sum_logp += log(p)
+
+            # get learning rate for current trial. if pos_alpha is not in
+            # include it will be same as alpha so can still use this
+            # calculation:
+            if feedbacks[i] == 1.0:
+                rl_alfa = (2.718281828459**alpha) / (1 + 2.718281828459**alpha)
+                wm_alfa = 1
+            else:
+                rl_alfa = (1-pers)*((2.718281828459**alpha) / (1 + 2.718281828459**alpha))
+                wm_alfa = (1-pers)*1
+            #print('5')   
+            # feedbacks is reward
+            # received on current trial.
+            qs[responses[i],stims[i]] = qs[responses[i],stims[i]] + \
+                rl_alfa * (feedbacks[i] - qs[responses[i],stims[i]])
+
+            ws[responses[i],stims[i]] = ws[responses[i],stims[i]] + \
+                wm_alfa * (feedbacks[i] - ws[responses[i],stims[i]])
+
+            #print('ws before decay: ', ws)
+            #we assume that WM weights decay at each trial according to 𝑊𝑡+1=𝑊𝑡+𝜑𝑊𝑀(𝑊0−𝑊𝑡)
+            ws = ws + phi*((1/nsd)-ws)
+            #print('ws after decay: ', ws)
     return sum_logp
 
 def wiener_like_multi(np.ndarray[double, ndim=1] x, v, sv, a, z, sz, t, st, double err, multi=None,
