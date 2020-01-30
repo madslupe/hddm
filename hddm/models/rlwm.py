@@ -90,7 +90,7 @@ class Hrlwm(HDDM):
         return Knode(self.rlwm_class, 'wfpt', observed=True, col_name=['split_by', 'feedback', 'response', 'n_stim','stim'], **wfpt_parents)
 
 
-def RLWM_like(x, alpha, rho, phi, epsilon, pers, z=0.5, p_outlier=0): #put in K here when it works with dirichlet/categorical
+def RLWM_like(x, v, alpha, rho, phi, epsilon, pers, z=0.5, p_outlier=0): #put in K here when it works with dirichlet/categorical
 
     wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
                      'use_adaptive': 1,
