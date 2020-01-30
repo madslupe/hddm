@@ -245,7 +245,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
                    np.ndarray[long, ndim=1] split_by,
                    np.ndarray[long, ndim=1] stim,
                    np.ndarray[long, ndim=1] n, 
-                   double alpha, double v, double z, double rho, double phi, double epsilon, double pers, int K,
+                   double alpha, double z, double rho, double phi, double epsilon, double pers, int K,
                    double err=1e-4, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                    double p_outlier=0, double w_outlier=0):
     #print('heiehe')
