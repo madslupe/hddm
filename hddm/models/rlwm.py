@@ -103,7 +103,7 @@ def RLWM_like(x, alpha, rho, phi, epsilon, pers, z=0.5, p_outlier=0): #put in K 
     feedback = x['feedback'].values
     split_by = x['split_by'].values
     stim = x['stim'].values
-    K = 3
+    K = 5
     #print('response: ', response, 'n: ', n, 'feedback: ', feedback, 'split_by: ', split_by, 'alpha: ', alpha, 'rho: ', rho, 'phi: ', phi, 'epsilon: ', epsilon, 'pers: ', pers, 'K: ', K)
     return wiener_like_rlwm(response, feedback, split_by, stim, n, alpha, z, rho, phi, epsilon, pers, K, p_outlier=p_outlier, **wp)
 RLWM = stochastic_from_dist('RLWM', RLWM_like)
