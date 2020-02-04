@@ -35,7 +35,7 @@ class Hrlwm(HDDM):
 
     def _create_stochastic_knodes(self, include):
         #v is not estimated, try to exclude it. used to be params = ['v']
-        params = []
+        params = ['v']
         if 'p_outlier' in self.include:
             params.append('p_outlier')
         if 'z' in self.include:
