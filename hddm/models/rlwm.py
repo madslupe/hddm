@@ -73,7 +73,7 @@ class Hrlwm(HDDM):
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = OrderedDict()
-        #wfpt_parents['v'] = knodes['v_bottom']
+        wfpt_parents['v'] = knodes['v_bottom']
         wfpt_parents['alpha'] = knodes['alpha_bottom']
         wfpt_parents['rho'] = knodes['rho_bottom']
         wfpt_parents['phi'] = knodes['phi_bottom']
