@@ -266,6 +266,7 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
     cdef double nsd
     cdef int ns 
     cdef int K = 5
+    cdef double Beta = 50
     #print('here')
     cdef np.ndarray[double, ndim=2] qs #= np.array([prob]*n[0]) #np.array([prob,prob,prob,prob,prob,prob,prob])#np.array([1/n]*n)
     cdef np.ndarray[double, ndim=2] ws #= np.array([prob]*n[0]) # 
@@ -338,8 +339,8 @@ def wiener_like_rlwm(np.ndarray[long, ndim=1] response,
         # loop through all trials in current condition
         for i in range(1, s_size):
             #calculate probabilites for the separate contributors
-            p_rl = (2.718281828459**(qs[responses[i],stims[i]])/sum(2.718281828459**(qs[:,stims[i]])))
-            p_wm = (2.718281828459**(ws[responses[i],stims[i]])/sum(2.718281828459**(ws[:,stims[i]])))
+            p_rl = (2.718281828459**(Beta*qs[responses[i],stims[i]])/sum(2.718281828459**(Beta*qs[:,stims[i]])))
+            p_wm = (2.718281828459**(Beta*ws[responses[i],stims[i]])/sum(2.718281828459**(Beta*ws[:,stims[i]])))
             #print('p_rl :', p_rl)
             #print('p_wm :', p_wm)
             p = weight_wm * p_wm + (1-weight_wm) * p_rl 
