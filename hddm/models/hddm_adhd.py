@@ -106,9 +106,9 @@ class HDDMadhd(HDDM):
         wfpt_parents['b_v_dmed'] = knodes['b_v_dmed_bottom'] if self.b_v_dmed else 0.0
         wfpt_parents['b_v_dsess'] = knodes['b_v_dsess_bottom'] if self.b_v_dsess else 0.0
         wfpt_parents['b_v_zpos_dmed'] = knodes['b_v_zpos_dmed_bottom'] if self.b_v_zpos_dmed else 0.0
-        wfpt_parents['b_v_zneg_dmed'] = knodes['b_v_zpos_dmed_bottom'] if self.b_v_zneg_dmed else 0.0
+        wfpt_parents['b_v_zneg_dmed'] = knodes['b_v_zneg_dmed_bottom'] if self.b_v_zneg_dmed else 0.0
         wfpt_parents['b_v_zpos_dsess'] = knodes['b_v_zpos_dsess_bottom'] if self.b_v_zpos_dsess else 0.0
-        wfpt_parents['b_v_zneg_dsess'] = knodes['b_v_zpos_dsess_bottom'] if self.b_v_zneg_dsess else 0.0
+        wfpt_parents['b_v_zneg_dsess'] = knodes['b_v_zneg_dsess_bottom'] if self.b_v_zneg_dsess else 0.0
         wfpt_parents['b_v_dmed_dsess'] = knodes['b_v_dmed_dsess_bottom'] if self.b_v_dmed_dsess else 0.0
         wfpt_parents['b_v_zpos_dmed_dsess'] = knodes['b_v_zpos_dmed_dsess_bottom'] if self.b_v_zpos_dmed_dsess else 0.0
         wfpt_parents['b_v_zneg_dmed_dsess'] = knodes['b_v_zneg_dmed_dsess_bottom'] if self.b_v_zneg_dmed_dsess else 0.0
