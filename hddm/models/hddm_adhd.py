@@ -48,6 +48,13 @@ class HDDMadhd(HDDM):
         super(HDDMadhd, self).__init__(*args, **kwargs)
 
     def _create_stochastic_knodes(self, include):
+        params = ['v','a','t','b_v_zpos','b_v_zneg','b_v_dmed', 'b_v_dsess','b_v_zpos_dmed',' b_v_zneg_dmed', 'b_v_zpos_dsess', 'b_v_zneg_dsess', 'b_v_dmed_dsess', 'b_v_zpos_dmed_dsess', 'b_v_zneg_dmed_dsess',' b_a_dmed', 'b_a_dsess', 'b_a_dmed_dsess', 'b_t_dmed', 'b_t_dsess', 'b_t_dmed_dsess', 'b_z_dmed', 'b_z_dsess','b_z_dmed_dsess']
+        if 'p_outlier' in self.include:
+            params.append('p_outlier')
+        if 'z' in self.include:
+            params.append('z')
+        include = set(params)
+
         knodes = super(HDDMadhd, self)._create_stochastic_knodes(include)
         if self.b_v_zpos:
             knodes.update(self._create_family_normal(
