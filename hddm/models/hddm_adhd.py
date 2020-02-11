@@ -19,42 +19,35 @@ class HDDMadhd(HDDM):
     """
 
     def __init__(self, *args, **kwargs):
-        self.b_v_zpos = kwargs.pop('b_v_zpos', True)
-        self.b_v_zneg = kwargs.pop('b_v_zneg', True)
-        self.b_v_dmed = kwargs.pop('b_v_dmed', True)
-        self.b_v_dsess = kwargs.pop('b_v_dsess', True)
-        self.b_v_zpos_dmed = kwargs.pop('b_v_zpos_dmed', True)
-        self.b_v_zneg_dmed = kwargs.pop('b_v_zneg_dmed', True)
-        self.b_v_zpos_dsess = kwargs.pop('b_v_zpos_dsess', True)
-        self.b_v_zneg_dsess = kwargs.pop('b_v_zneg_dsess', True)
-        self.b_v_dmed_dsess = kwargs.pop('b_v_dmed_dsess', True)
-        self.b_v_zpos_dmed_dsess = kwargs.pop('b_v_zpos_dmed_dsess', True)
-        self.b_v_zneg_dmed_dsess = kwargs.pop('b_v_zneg_dmed_dsess', True)
+        self.b_v_zpos = kwargs.pop('b_v_zpos', False)
+        self.b_v_zneg = kwargs.pop('b_v_zneg', False)
+        self.b_v_dmed = kwargs.pop('b_v_dmed', False)
+        self.b_v_dsess = kwargs.pop('b_v_dsess', False)
+        self.b_v_zpos_dmed = kwargs.pop('b_v_zpos_dmed', False)
+        self.b_v_zneg_dmed = kwargs.pop('b_v_zneg_dmed', False)
+        self.b_v_zpos_dsess = kwargs.pop('b_v_zpos_dsess', False)
+        self.b_v_zneg_dsess = kwargs.pop('b_v_zneg_dsess', False)
+        self.b_v_dmed_dsess = kwargs.pop('b_v_dmed_dsess', False)
+        self.b_v_zpos_dmed_dsess = kwargs.pop('b_v_zpos_dmed_dsess', False)
+        self.b_v_zneg_dmed_dsess = kwargs.pop('b_v_zneg_dmed_dsess', False)
 
-        self.b_a_dmed = kwargs.pop('b_a_dmed', True)
-        self.b_a_dsess = kwargs.pop('b_a_dsess', True)
-        self.b_a_dmed_dsess = kwargs.pop('b_a_dmed_dsess', True)
+        self.b_a_dmed = kwargs.pop('b_a_dmed', False)
+        self.b_a_dsess = kwargs.pop('b_a_dsess', False)
+        self.b_a_dmed_dsess = kwargs.pop('b_a_dmed_dsess', False)
 
-        self.b_t_dmed = kwargs.pop('b_t_dmed', True)
-        self.b_t_dsess = kwargs.pop('b_t_dsess', True)
-        self.b_t_dmed_dsess = kwargs.pop('b_t_dmed_dsess', True)
+        self.b_t_dmed = kwargs.pop('b_t_dmed', False)
+        self.b_t_dsess = kwargs.pop('b_t_dsess', False)
+        self.b_t_dmed_dsess = kwargs.pop('b_t_dmed_dsess', False)
 
-        self.b_z_dmed = kwargs.pop('b_z_dmed', True)
-        self.b_z_dsess = kwargs.pop('b_z_dsess', True)
-        self.b_z_dmed_dsess = kwargs.pop('b_z_dmed_dsess', True)
+        self.b_z_dmed = kwargs.pop('b_z_dmed', False)
+        self.b_z_dsess = kwargs.pop('b_z_dsess', False)
+        self.b_z_dmed_dsess = kwargs.pop('b_z_dmed_dsess', False)
 
         self.wfpt_adhd_class = WienerADHD
 
         super(HDDMadhd, self).__init__(*args, **kwargs)
 
     def _create_stochastic_knodes(self, include):
-        params = ['v','a','t','b_v_zpos','b_v_zneg','b_v_dmed', 'b_v_dsess','b_v_zpos_dmed',' b_v_zneg_dmed', 'b_v_zpos_dsess', 'b_v_zneg_dsess', 'b_v_dmed_dsess', 'b_v_zpos_dmed_dsess', 'b_v_zneg_dmed_dsess',' b_a_dmed', 'b_a_dsess', 'b_a_dmed_dsess', 'b_t_dmed', 'b_t_dsess', 'b_t_dmed_dsess', 'b_z_dmed', 'b_z_dsess','b_z_dmed_dsess']
-        if 'p_outlier' in self.include:
-            params.append('p_outlier')
-        if 'z' in self.include:
-            params.append('z')
-        include = set(params)
-
         knodes = super(HDDMadhd, self)._create_stochastic_knodes(include)
         if self.b_v_zpos:
             knodes.update(self._create_family_normal(
