@@ -128,7 +128,7 @@ class HDDMadhd(HDDM):
         return Knode(self.wfpt_adhd_class, 'wfpt', observed=True, col_name=['rt', 'zpos','zneg','dmed','dsess'], **wfpt_parents)
 
 
-def wienerADHD_like(x, v, sv, a, z, sz, t, st, p_outlier=0):
+def wienerADHD_like(x, v, sv, a, z, sz, t, st,b_v_zpos, b_v_zneg, b_v_dmed, b_v_dsess, b_v_zpos_dmed, b_v_zneg_dmed, b_v_zpos_dsess, b_v_zneg_dsess, b_v_dmed_dsess, b_v_zpos_dmed_dsess, b_v_zneg_dmed_dsess, b_a_dmed, b_a_dsess, b_a_dmed_dsess, b_t_dmed, b_t_dsess, b_t_dmed_dsess, b_z_dmed, b_z_dsess, b_z_dmed_dsess , p_outlier=0):
 
     wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
                      'use_adaptive': 1,
