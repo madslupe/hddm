@@ -101,26 +101,26 @@ class HDDMadhd(HDDM):
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = super(HDDMadhd, self)._create_wfpt_parents_dict(knodes)
-        wfpt_parents['b_v_zpos'] = knodes['b_v_zpos_bottom']
-        wfpt_parents['b_v_zneg'] = knodes['b_v_zneg_bottom']
-        wfpt_parents['b_v_dmed'] = knodes['b_v_dmed_bottom']
-        wfpt_parents['b_v_dsess'] = knodes['b_v_dsess_bottom']
-        wfpt_parents['b_v_zpos_dmed'] = knodes['b_v_zpos_dmed_bottom']
-        wfpt_parents['b_v_zneg_dmed'] = knodes['b_v_zpos_dmed_bottom']
-        wfpt_parents['b_v_zpos_dsess'] = knodes['b_v_zpos_dsess_bottom']
-        wfpt_parents['b_v_zneg_dsess'] = knodes['b_v_zpos_dsess_bottom']
-        wfpt_parents['b_v_dmed_dsess'] = knodes['b_v_dmed_dsess_bottom']
-        wfpt_parents['b_v_zpos_dmed_dsess'] = knodes['b_v_zpos_dmed_dsess_bottom']
-        wfpt_parents['b_v_zneg_dmed_dsess'] = knodes['b_v_zneg_dmed_dsess_bottom']
-        wfpt_parents['b_a_dmed'] = knodes['b_a_dmed_bottom']
-        wfpt_parents['b_a_dsess'] = knodes['b_a_dsess_bottom']
-        wfpt_parents['b_a_dmed_dsess'] = knodes['b_a_dmed_dsess_bottom']
-        wfpt_parents['b_t_dmed'] = knodes['b_t_dmed_bottom']
-        wfpt_parents['b_t_dsess'] = knodes['b_t_dsess_bottom']
-        wfpt_parents['b_t_dmed_dsess'] = knodes['b_t_dmed_dsess_bottom']
-        wfpt_parents['b_z_dmed'] = knodes['b_z_dmed_bottom']
-        wfpt_parents['b_z_dsess'] = knodes['b_z_dsess_bottom']
-        wfpt_parents['b_z_dmed_dsess'] = knodes['b_z_dmed_dsess_bottom']
+        wfpt_parents['b_v_zpos'] = knodes['b_v_zpos_bottom'] if self.b_v_zpos else 0.0
+        wfpt_parents['b_v_zneg'] = knodes['b_v_zneg_bottom'] if self.b_v_zneg else 0.0
+        wfpt_parents['b_v_dmed'] = knodes['b_v_dmed_bottom'] if self.b_v_dmed else 0.0
+        wfpt_parents['b_v_dsess'] = knodes['b_v_dsess_bottom'] if self.b_v_dsess else 0.0
+        wfpt_parents['b_v_zpos_dmed'] = knodes['b_v_zpos_dmed_bottom'] if self.b_v_zpos_dmed else 0.0
+        wfpt_parents['b_v_zneg_dmed'] = knodes['b_v_zpos_dmed_bottom'] if self.b_v_zneg_dmed else 0.0
+        wfpt_parents['b_v_zpos_dsess'] = knodes['b_v_zpos_dsess_bottom'] if self.b_v_zpos_dsess else 0.0
+        wfpt_parents['b_v_zneg_dsess'] = knodes['b_v_zpos_dsess_bottom'] if self.b_v_zneg_dsess else 0.0
+        wfpt_parents['b_v_dmed_dsess'] = knodes['b_v_dmed_dsess_bottom'] if self.b_v_dmed_dsess else 0.0
+        wfpt_parents['b_v_zpos_dmed_dsess'] = knodes['b_v_zpos_dmed_dsess_bottom'] if self.b_v_zpos_dmed_dsess else 0.0
+        wfpt_parents['b_v_zneg_dmed_dsess'] = knodes['b_v_zneg_dmed_dsess_bottom'] if self.b_v_zneg_dmed_dsess else 0.0
+        wfpt_parents['b_a_dmed'] = knodes['b_a_dmed_bottom']  if self.b_a_dmed else 0.0
+        wfpt_parents['b_a_dsess'] = knodes['b_a_dsess_bottom'] if self.b_a_dsess else 0.0
+        wfpt_parents['b_a_dmed_dsess'] = knodes['b_a_dmed_dsess_bottom'] if self.b_a_dmed_dsess else 0.0
+        wfpt_parents['b_t_dmed'] = knodes['b_t_dmed_bottom']  if self.b_t_dmed else 0.0
+        wfpt_parents['b_t_dsess'] = knodes['b_t_dsess_bottom'] if self.b_t_dsess else 0.0
+        wfpt_parents['b_t_dmed_dsess'] = knodes['b_t_dmed_dsess_bottom'] if self.b_t_dmed_dsess else 0.0
+        wfpt_parents['b_z_dmed'] = knodes['b_z_dmed_bottom'] if self.b_z_dmed else 0.0
+        wfpt_parents['b_z_dsess'] = knodes['b_z_dsess_bottom'] if self.b_z_dsess else 0.0
+        wfpt_parents['b_z_dmed_dsess'] = knodes['b_z_dmed_dsess_bottom'] if self.b_z_dmed_dsess else 0.0
         return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):
@@ -128,7 +128,7 @@ class HDDMadhd(HDDM):
         return Knode(self.wfpt_adhd_class, 'wfpt', observed=True, col_name=['rt', 'zpos','zneg','dmed','dsess'], **wfpt_parents)
 
 
-def wienerADHD_like(x, v, sv, a, z, sz, t, st,b_v_zpos, b_v_zneg, b_v_dmed, b_v_dsess, b_v_zpos_dmed, b_v_zneg_dmed, b_v_zpos_dsess, b_v_zneg_dsess, b_v_dmed_dsess, b_v_zpos_dmed_dsess, b_v_zneg_dmed_dsess, b_a_dmed, b_a_dsess, b_a_dmed_dsess, b_t_dmed, b_t_dsess, b_t_dmed_dsess, b_z_dmed, b_z_dsess, b_z_dmed_dsess , p_outlier=0):
+def wienerADHD_like(x, v, sv, a, z, sz, t, st,b_v_zpos, b_v_zneg, b_v_dmed, b_v_dsess, b_v_zpos_dmed, b_v_zneg_dmed, b_v_zpos_dsess, b_v_zneg_dsess, b_v_dmed_dsess, b_v_zpos_dmed_dsess, b_v_zneg_dmed_dsess, b_a_dmed, b_a_dsess, b_a_dmed_dsess, b_t_dmed, b_t_dsess, b_t_dmed_dsess, b_z_dmed, b_z_dsess, b_z_dmed_dsess, p_outlier=0):
 
     wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
                      'use_adaptive': 1,
