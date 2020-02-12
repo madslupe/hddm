@@ -703,7 +703,7 @@ class HDDMBase(AccumulatorModel):
         if bias:
             self.include.add('z')
 
-        possible_parameters = ('v', 'a', 't', 'z', 'st', 'sz', 'sv', 'p_outlier','dual_alpha','b_v_zpos','b_v_zneg','b_v_dmed', 'b_v_dsess','b_v_zpos_dmed',' b_v_zneg_dmed', 'b_v_zpos_dsess', 'b_v_zneg_dsess', 'b_v_dmed_dsess', 'b_v_zpos_dmed_dsess', 'b_v_zneg_dmed_dsess',' b_a_dmed', 'b_a_dsess', 'b_a_dmed_dsess', 'b_t_dmed', 'b_t_dsess', 'b_t_dmed_dsess', 'b_z_dmed', 'b_z_dsess','b_z_dmed_dsess')
+        possible_parameters = ('v', 'a', 't', 'z', 'st', 'sz', 'sv', 'p_outlier','dual_alpha')
         assert self.include.issubset(possible_parameters), """Received and invalid parameter using the 'include' keyword.
         parameters received: %s
         parameters allowed: %s """ % (tuple(self.include), possible_parameters)
@@ -829,3 +829,4 @@ class HDDMBase(AccumulatorModel):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+
