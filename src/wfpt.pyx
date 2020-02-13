@@ -113,6 +113,43 @@ def wiener_like_adhd(np.ndarray[double, ndim=1] x,
 
     return sum_logp
 
+def wiener_like_fullmodel(np.ndarray[double, ndim=1] x, 
+                     np.ndarray[double, ndim=1] zpos,
+                     np.ndarray[double, ndim=1] zneg,
+                     np.ndarray[double, ndim=1] dmed,
+                     np.ndarray[double, ndim=1] dsess,
+                     double b_v_zpos, double b_v_zneg, double b_v_dmed, double b_v_dsess, double b_v_zpos_dmed, double b_v_zneg_dmed, 
+                     double b_v_zpos_dsess, double b_v_zneg_dsess, double b_v_dmed_dsess, double b_v_zpos_dmed_dsess, double b_v_zneg_dmed_dsess, 
+                     double b_a_dmed, double b_a_dsess, double b_a_dmed_dsess, 
+                     double b_t_dmed, double b_t_dsess, double b_t_dmed_dsess, 
+                     double b_z_dmed, double b_z_dsess, double b_z_dmed_dsess,
+                     double v, double sv, double a, double z, double sz, double t,
+                     double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
+                     double p_outlier=0, double w_outlier=0):
+    cdef Py_ssize_t size = x.shape[0]
+    cdef Py_ssize_t i
+    cdef double p
+    cdef double sum_logp = 0
+    cdef double wp_outlier = w_outlier * p_outlier
+
+    if not p_outlier_in_range(p_outlier):
+        return -np.inf
+
+    for i in range(size):
+        p = full_pdf(x[i], v + (zpos[i] * b_v_zpos) + (zneg[i] * b_v_zneg) + (zpos[i] * dmed[i] * b_v_zpos_dmed) + (zneg[i] * dmed[i] * b_v_zneg_dmed) + (zpos[i] * dsess[i] * b_v_zpos_dsess) + (zneg[i] * dsess[i] * b_v_zneg_dsess) + (zpos[i]*dsess[i]*dmed[i]*b_v_zpos_dmed_dsess)+ (zneg[i]*dsess[i]*dmed[i]*b_v_zneg_dmed_dsess) + (dmed[i]*b_v_dmed) + (dsess[i]*b_v_dsess) + (dsess[i]*dmed[i]*b_v_dmed_dsess), sv, 
+                     a + (dmed[i]*b_a_dmed) + (dsess[i]*b_a_dsess) + (dsess[i]*dmed[i]*b_a_dmed_dsess),
+                     z + (dmed[i]*b_z_dmed) + (dsess[i]*b_z_dsess) + (dsess[i]*dmed[i]*b_z_dmed_dsess), sz, 
+                     t + (dmed[i]*b_t_dmed) + (dsess[i]*b_t_dsess) + (dsess[i]*dmed[i]*b_t_dmed_dsess), st, err,
+                     n_st, n_sz, use_adaptive, simps_err)
+        # If one probability = 0, the log sum will be -Inf
+        p = p * (1 - p_outlier) + wp_outlier
+        if p == 0:
+            return -np.inf
+
+        sum_logp += log(p)
+
+    return sum_logp
+
 def wiener_like_all(np.ndarray[double, ndim=1] x, 
                      np.ndarray[double, ndim=1] zpos,
                      np.ndarray[double, ndim=1] zneg,

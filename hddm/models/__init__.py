@@ -6,6 +6,7 @@ from .hddm_stimcoding import HDDMStimCoding
 from .hddm_regression import HDDMRegressor
 from .hddm_rl import HDDMrl
 from .hddm_adhd import HDDMadhd
+from. hddm_fullmodel import HDDMfullmodel
 from .hddm_all import HDDMall
 from .rl import Hrl
 
