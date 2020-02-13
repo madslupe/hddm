@@ -20,5 +20,6 @@ __all__ = ['AccumulatorModel',
            'HDDMrl',
            'HDDMadhd',
            'HDDMall',
+           'HDDMfullmodel',
            'Hrl',
 ]
