@@ -81,11 +81,12 @@ def wiener_like_adhd(np.ndarray[double, ndim=1] x,
                      np.ndarray[double, ndim=1] dmed,
                      np.ndarray[double, ndim=1] dsess,
                      np.ndarray[double, ndim=1] ztrain,
-                     double b_v_zpos, double b_v_zneg, double b_v_dmed, double b_v_ztrain, double b_v_zpos_dmed, double b_v_zneg_dmed, 
+                     np.ndarray[double, ndim=1] zarm,
+                     double b_v_zpos, double b_v_zneg, double b_v_dmed, double b_v_ztrain, double b_v_zarm,double b_v_zpos_zarm, double b_v_zneg_zarm,double b_v_zpos_dmed, double b_v_zneg_dmed, 
                      double b_v_zpos_ztrain, double b_v_zneg_ztrain, double b_v_dmed_ztrain, double b_v_zpos_dmed_ztrain, double b_v_zneg_dmed_ztrain, 
-                     double b_a_dmed, double b_a_ztrain, double b_a_dmed_ztrain, 
-                     double b_t_dmed, double b_t_ztrain, double b_t_dmed_ztrain, 
-                     double b_z_dmed, double b_z_ztrain, double b_z_dmed_ztrain,
+                     double b_a_dmed, double b_a_ztrain, double b_a_zarm,double b_a_dmed_ztrain, 
+                     double b_t_dmed, double b_t_ztrain, double b_t_zarm,double b_t_dmed_ztrain, 
+                     double b_z_dmed, double b_z_ztrain, double b_z_zarm,double b_z_dmed_ztrain,
                      double v, double sv, double a, double z, double sz, double t,
                      double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                      double p_outlier=0, double w_outlier=0):
@@ -99,10 +100,10 @@ def wiener_like_adhd(np.ndarray[double, ndim=1] x,
         return -np.inf
 
     for i in range(size):
-        p = full_pdf(x[i], v + (zpos[i] * b_v_zpos) + (zneg[i] * b_v_zneg) + (zpos[i] * dmed[i] * b_v_zpos_dmed) + (zneg[i] * dmed[i] * b_v_zneg_dmed) + (zpos[i] * ztrain[i] * b_v_zpos_ztrain) + (zneg[i] * ztrain[i] * b_v_zneg_ztrain) + (zpos[i]*ztrain[i]*dmed[i]*b_v_zpos_dmed_ztrain)+ (zneg[i]*ztrain[i]*dmed[i]*b_v_zneg_dmed_ztrain) + (dmed[i]*b_v_dmed) + (ztrain[i]*b_v_ztrain) + (ztrain[i]*dmed[i]*b_v_dmed_ztrain), sv, 
-                     a + (dmed[i]*b_a_dmed) + (ztrain[i]*b_a_ztrain) + (ztrain[i]*dmed[i]*b_a_dmed_ztrain),
-                     z + (dmed[i]*b_z_dmed) + (ztrain[i]*b_z_ztrain) + (ztrain[i]*dmed[i]*b_z_dmed_ztrain), sz, 
-                     t + (dmed[i]*b_t_dmed) + (ztrain[i]*b_t_ztrain) + (ztrain[i]*dmed[i]*b_t_dmed_ztrain), st, err,
+        p = full_pdf(x[i], v + (zpos[i] * b_v_zpos) + (zneg[i] * b_v_zneg) + (zarm[i] * b_v_zarm) + (zpos[i] * dmed[i] * b_v_zpos_dmed) + (zneg[i] * dmed[i] * b_v_zneg_dmed) + (zpos[i] * zarm[i] * b_v_zpos_zarm) + (zneg[i] * zarm[i] * b_v_zneg_zarm) + (zpos[i] * ztrain[i] * b_v_zpos_ztrain) + (zneg[i] * ztrain[i] * b_v_zneg_ztrain) + (zpos[i]*ztrain[i]*dmed[i]*b_v_zpos_dmed_ztrain)+ (zneg[i]*ztrain[i]*dmed[i]*b_v_zneg_dmed_ztrain) + (dmed[i]*b_v_dmed) + (ztrain[i]*b_v_ztrain) + (ztrain[i]*dmed[i]*b_v_dmed_ztrain), sv, 
+                     a + (dmed[i]*b_a_dmed) + (ztrain[i]*b_a_ztrain) + (zarm[i] * b_a_zarm) + (ztrain[i]*dmed[i]*b_a_dmed_ztrain),
+                     z + (dmed[i]*b_z_dmed) + (ztrain[i]*b_z_ztrain) + (zarm[i] * b_z_zarm) + (ztrain[i]*dmed[i]*b_z_dmed_ztrain), sz, 
+                     t + (dmed[i]*b_t_dmed) + (ztrain[i]*b_t_ztrain) + (zarm[i] * b_t_zarm) + (ztrain[i]*dmed[i]*b_t_dmed_ztrain), st, err,
                      n_st, n_sz, use_adaptive, simps_err)
         # If one probability = 0, the log sum will be -Inf
         p = p * (1 - p_outlier) + wp_outlier
@@ -112,6 +113,46 @@ def wiener_like_adhd(np.ndarray[double, ndim=1] x,
         sum_logp += log(p)
 
     return sum_logp
+
+def wiener_like_all(np.ndarray[double, ndim=1] x, 
+                     np.ndarray[double, ndim=1] zpos,
+                     np.ndarray[double, ndim=1] zneg,
+                     np.ndarray[double, ndim=1] dgroup,
+                     np.ndarray[double, ndim=1] dsess,
+                     np.ndarray[double, ndim=1] ztrain,
+                     np.ndarray[double, ndim=1] zarm,
+                     double b_v_zpos, double b_v_zneg, double b_v_dgroup, double b_v_ztrain, double b_v_zarm,double b_v_zpos_zarm, double b_v_zneg_zarm,double b_v_zpos_dgroup, double b_v_zneg_dgroup, 
+                     double b_v_zpos_ztrain, double b_v_zneg_ztrain, double b_v_dgroup_ztrain, double b_v_zpos_dgroup_ztrain, double b_v_zneg_dgroup_ztrain, 
+                     double b_a_dgroup, double b_a_ztrain,double b_a_zarm, double b_a_dgroup_ztrain, 
+                     double b_t_dgroup, double b_t_ztrain,double b_t_zarm, double b_t_dgroup_ztrain, 
+                     double b_z_dgroup, double b_z_ztrain,double b_z_zarm, double b_z_dgroup_ztrain,
+                     double v, double sv, double a, double z, double sz, double t,
+                     double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
+                     double p_outlier=0, double w_outlier=0):
+    cdef Py_ssize_t size = x.shape[0]
+    cdef Py_ssize_t i
+    cdef double p
+    cdef double sum_logp = 0
+    cdef double wp_outlier = w_outlier * p_outlier
+
+    if not p_outlier_in_range(p_outlier):
+        return -np.inf
+
+    for i in range(size):
+        p = full_pdf(x[i], v + (zpos[i] * b_v_zpos) + (zneg[i] * b_v_zneg) + (zarm[i] * b_v_zarm) + (zpos[i] * dgroup[i] * b_v_zpos_dgroup) + (zneg[i] * dgroup[i] * b_v_zneg_dgroup) + (zpos[i] * zarm[i] * b_v_zpos_zarm) + (zneg[i] * zarm[i] * b_v_zneg_zarm)+ (zpos[i] * ztrain[i] * b_v_zpos_ztrain) + (zneg[i] * zarm[i] * b_v_zneg_zarm)+ (zpos[i] * ztrain[i] * b_v_zpos_ztrain) + (zneg[i] * ztrain[i] * b_v_zneg_ztrain) + (zpos[i]*ztrain[i]*dgroup[i]*b_v_zpos_dgroup_ztrain)+ (zneg[i]*ztrain[i]*dgroup[i]*b_v_zneg_dgroup_ztrain) + (dgroup[i]*b_v_dgroup) + (ztrain[i]*b_v_ztrain) + (ztrain[i]*dgroup[i]*b_v_dgroup_ztrain), sv, 
+                     a + (dgroup[i]*b_a_dgroup) + (ztrain[i]*b_a_ztrain) + (zarm[i] * b_a_zarm)+ (ztrain[i]*dgroup[i]*b_a_dgroup_ztrain),
+                     z + (dgroup[i]*b_z_dgroup) + (ztrain[i]*b_z_ztrain) + (zarm[i] * b_z_zarm)+ (ztrain[i]*dgroup[i]*b_z_dgroup_ztrain), sz, 
+                     t + (dgroup[i]*b_t_dgroup) + (ztrain[i]*b_t_ztrain) + (zarm[i] * b_t_zarm)+ (ztrain[i]*dgroup[i]*b_t_dgroup_ztrain), st, err,
+                     n_st, n_sz, use_adaptive, simps_err)
+        # If one probability = 0, the log sum will be -Inf
+        p = p * (1 - p_outlier) + wp_outlier
+        if p == 0:
+            return -np.inf
+
+        sum_logp += log(p)
+
+    return sum_logp
+
 
 def wiener_like_fullmodel(np.ndarray[double, ndim=1] x, 
                      np.ndarray[double, ndim=1] zpos,
@@ -140,44 +181,6 @@ def wiener_like_fullmodel(np.ndarray[double, ndim=1] x,
                      a + (dmed[i]*b_a_dmed) + (dsess[i]*b_a_dsess) + (dsess[i]*dmed[i]*b_a_dmed_dsess),
                      z + (dmed[i]*b_z_dmed) + (dsess[i]*b_z_dsess) + (dsess[i]*dmed[i]*b_z_dmed_dsess), sz, 
                      t + (dmed[i]*b_t_dmed) + (dsess[i]*b_t_dsess) + (dsess[i]*dmed[i]*b_t_dmed_dsess), st, err,
-                     n_st, n_sz, use_adaptive, simps_err)
-        # If one probability = 0, the log sum will be -Inf
-        p = p * (1 - p_outlier) + wp_outlier
-        if p == 0:
-            return -np.inf
-
-        sum_logp += log(p)
-
-    return sum_logp
-
-def wiener_like_all(np.ndarray[double, ndim=1] x, 
-                     np.ndarray[double, ndim=1] zpos,
-                     np.ndarray[double, ndim=1] zneg,
-                     np.ndarray[double, ndim=1] dgroup,
-                     np.ndarray[double, ndim=1] dsess,
-                     np.ndarray[double, ndim=1] ztrain,
-                     double b_v_zpos, double b_v_zneg, double b_v_dgroup, double b_v_ztrain, double b_v_zpos_dgroup, double b_v_zneg_dgroup, 
-                     double b_v_zpos_ztrain, double b_v_zneg_ztrain, double b_v_dgroup_ztrain, double b_v_zpos_dgroup_ztrain, double b_v_zneg_dgroup_ztrain, 
-                     double b_a_dgroup, double b_a_ztrain, double b_a_dgroup_ztrain, 
-                     double b_t_dgroup, double b_t_ztrain, double b_t_dgroup_ztrain, 
-                     double b_z_dgroup, double b_z_ztrain, double b_z_dgroup_ztrain,
-                     double v, double sv, double a, double z, double sz, double t,
-                     double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
-                     double p_outlier=0, double w_outlier=0):
-    cdef Py_ssize_t size = x.shape[0]
-    cdef Py_ssize_t i
-    cdef double p
-    cdef double sum_logp = 0
-    cdef double wp_outlier = w_outlier * p_outlier
-
-    if not p_outlier_in_range(p_outlier):
-        return -np.inf
-
-    for i in range(size):
-        p = full_pdf(x[i], v + (zpos[i] * b_v_zpos) + (zneg[i] * b_v_zneg) + (zpos[i] * dgroup[i] * b_v_zpos_dgroup) + (zneg[i] * dgroup[i] * b_v_zneg_dgroup) + (zpos[i] * ztrain[i] * b_v_zpos_ztrain) + (zneg[i] * ztrain[i] * b_v_zneg_ztrain) + (zpos[i]*ztrain[i]*dgroup[i]*b_v_zpos_dgroup_ztrain)+ (zneg[i]*ztrain[i]*dgroup[i]*b_v_zneg_dgroup_ztrain) + (dgroup[i]*b_v_dgroup) + (ztrain[i]*b_v_ztrain) + (ztrain[i]*dgroup[i]*b_v_dgroup_ztrain), sv, 
-                     a + (dgroup[i]*b_a_dgroup) + (ztrain[i]*b_a_ztrain) + (ztrain[i]*dgroup[i]*b_a_dgroup_ztrain),
-                     z + (dgroup[i]*b_z_dgroup) + (ztrain[i]*b_z_ztrain) + (ztrain[i]*dgroup[i]*b_z_dgroup_ztrain), sz, 
-                     t + (dgroup[i]*b_t_dgroup) + (ztrain[i]*b_t_ztrain) + (ztrain[i]*dgroup[i]*b_t_dgroup_ztrain), st, err,
                      n_st, n_sz, use_adaptive, simps_err)
         # If one probability = 0, the log sum will be -Inf
         p = p * (1 - p_outlier) + wp_outlier
