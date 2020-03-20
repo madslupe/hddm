@@ -152,7 +152,7 @@ class HDDMadhd(HDDM):
         return Knode(self.wfpt_adhd_class, 'wfpt', observed=True, col_name=['rt', 'zpos','zneg','dmed','dsess','ztrain','zarm'], **wfpt_parents)
 
 
-def wienerADHD_like(x, v, sv, a, z, sz, t, st,b_v_zpos, b_v_zneg, b_v_dmed, b_v_ztrain,b_v_zarm,b_v_zpos_zarm,b_v_zneg_zarm, b_v_zpos_dmed, b_v_zneg_dmed, b_v_zpos_ztrain, b_v_zneg_ztrain, b_v_dmed_ztrain, b_v_zpos_dmed_ztrain, b_v_zneg_dmed_ztrain, b_a_dmed, b_a_ztrain,b_a_zarm, b_a_dmed_ztrain, b_t_dmed, b_t_ztrain, b_t_zarm, b_t_dmed_ztrain, b_z_dmed, b_z_ztrain, b_z_zarm, b_z_dmed_ztrain, p_outlier=0):
+def wienerADHD_like(x, v, sv, a, z, sz, t, st,b_v_zpos, b_v_zneg, b_v_dmed, b_v_ztrain,b_v_zarm,b_v_zpos_zarm,b_v_zneg_zarm, b_v_zpos_dmed, b_v_zneg_dmed, b_v_zpos_ztrain, b_v_zneg_ztrain, b_v_dmed_ztrain, b_v_zpos_dmed_ztrain, b_v_zneg_dmed_ztrain, b_a_dmed, b_a_ztrain, b_a_zarm, b_a_dmed_ztrain, b_t_dmed, b_t_ztrain, b_t_zarm, b_t_dmed_ztrain, b_z_dmed, b_z_ztrain, b_z_zarm, b_z_dmed_ztrain, p_outlier=0):
 
     wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
                      'use_adaptive': 1,

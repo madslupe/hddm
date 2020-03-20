@@ -146,7 +146,7 @@ class HDDMall(HDDM):
         return Knode(self.wfpt_all_class, 'wfpt', observed=True, col_name=['rt', 'zpos','zneg','dgroup','dsess','ztrain','zarm'], **wfpt_parents)
 
 
-def wienerALL_like(x, v, sv, a, z, sz, t, st,b_v_zpos, b_v_zneg, b_v_dgroup, b_v_ztrain,b_v_zarm,b_v_zpos_zarm,b_v_zneg_zarm, b_v_zpos_dgroup, b_v_zneg_dgroup, b_v_zpos_ztrain, b_v_zneg_ztrain, b_v_dgroup_ztrain, b_v_zpos_dgroup_ztrain, b_v_zneg_dgroup_ztrain, b_a_dgroup, b_a_ztrain,b_a_zarm, b_a_dgroup_ztrain, b_t_dgroup, b_t_ztrain,b_t_zarm, b_t_dgroup_ztrain, b_z_dgroup, b_z_ztrain,b_t_zarm, b_z_dgroup_ztrain, p_outlier=0):
+def wienerALL_like(x, v, sv, a, z, sz, t, st,b_v_zpos, b_v_zneg, b_v_dgroup, b_v_ztrain,b_v_zarm,b_v_zpos_zarm,b_v_zneg_zarm, b_v_zpos_dgroup, b_v_zneg_dgroup, b_v_zpos_ztrain, b_v_zneg_ztrain, b_v_dgroup_ztrain, b_v_zpos_dgroup_ztrain, b_v_zneg_dgroup_ztrain, b_a_dgroup, b_a_ztrain,b_a_zarm, b_a_dgroup_ztrain, b_t_dgroup, b_t_ztrain,b_t_zarm, b_t_dgroup_ztrain, b_z_dgroup, b_z_ztrain,b_z_zarm, b_z_dgroup_ztrain, p_outlier=0):
 
     wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
                      'use_adaptive': 1,
