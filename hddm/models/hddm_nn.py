@@ -11,7 +11,7 @@ import pickle
 from kabuki.hierarchical import Knode
 from kabuki.utils import stochastic_from_dist
 from hddm.models import HDDM
-from wfpt import wiener_like_nnddm
+from wfpt import wiener_like_nn
 
 
 class HDDMnn(HDDM):
