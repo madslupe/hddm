@@ -43,6 +43,8 @@ class HDDMfullmodel(HDDM):
         self.b_z_dsess = kwargs.pop('b_z_dsess', True)
         self.b_z_dmed_dsess = kwargs.pop('b_z_dmed_dsess', True)
 
+        self.within_med = kwargs.pop('within_med',True)
+
         self.wfpt_fullmodel_class = WienerFULLMODEL
 
         super(HDDMfullmodel, self).__init__(*args, **kwargs)
@@ -55,17 +57,8 @@ class HDDMfullmodel(HDDM):
         if self.b_v_zneg:
             knodes.update(self._create_family_normal(
                     'b_v_zneg', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
-        if self.b_v_dmed:
-            knodes.update(self._create_family_normal(
-                    'b_v_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
         if self.b_v_dsess:
             knodes['b_v_dsess_bottom'] = Knode(pymc.Normal, 'b_v_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_v_dsess'])
-        if self.b_v_zpos_dmed:
-            knodes.update(self._create_family_normal(
-                    'b_v_zpos_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
-        if self.b_v_zneg_dmed:
-            knodes.update(self._create_family_normal(
-                    'b_v_zneg_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
         if self.b_v_zpos_dsess:
             knodes['b_v_zpos_dsess_bottom'] = Knode(pymc.Normal, 'b_v_zpos_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_v_zpos_dsess'])
         if self.b_v_zneg_dsess:
@@ -76,27 +69,52 @@ class HDDMfullmodel(HDDM):
             knodes['b_v_zpos_dmed_dsess_bottom'] = Knode(pymc.Normal, 'b_v_zpos_dmed_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_v_zpos_dmed_dsess'])
         if self.b_v_zneg_dmed_dsess:
             knodes['b_v_zneg_dmed_dsess_bottom'] = Knode(pymc.Normal, 'b_v_zneg_dmed_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_v_zneg_dmed_dsess'])
-        if self.b_a_dmed:
-            knodes.update(self._create_family_normal(
-                    'b_a_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
         if self.b_a_dsess:
             knodes['b_a_dsess_bottom'] = Knode(pymc.Normal, 'b_a_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_a_dsess'])
         if self.b_a_dmed_dsess:
             knodes['b_a_dmed_dsess_bottom'] = Knode(pymc.Normal, 'b_a_dmed_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_a_dmed_dsess'])
-        if self.b_t_dmed:
-            knodes.update(self._create_family_normal(
-                    'b_t_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
         if self.b_t_dsess:
             knodes['b_t_dsess_bottom'] = Knode(pymc.Normal, 'b_t_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_t_dsess'])
         if self.b_t_dmed_dsess:
             knodes['b_t_dmed_dsess_bottom'] = Knode(pymc.Normal, 'b_t_dmed_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_t_dmed_dsess'])
-        if self.b_z_dmed:
-            knodes.update(self._create_family_normal(
-                    'b_z_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
         if self.b_z_dsess:
             knodes['b_z_dsess_bottom'] = Knode(pymc.Normal, 'b_z_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_z_dsess'])
         if self.b_z_dmed_dsess:
             knodes['b_z_dmed_dsess_bottom'] = Knode(pymc.Normal, 'b_z_dmed_dsess', mu=0, tau=2**-2, value=0, depends=self.depends['b_z_dmed_dsess'])
+        if self.within_med:
+            if self.b_v_dmed:
+                knodes.update(self._create_family_normal(
+                        'b_v_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
+            if self.b_v_zpos_dmed:
+                knodes.update(self._create_family_normal(
+                        'b_v_zpos_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
+            if self.b_v_zneg_dmed:
+                knodes.update(self._create_family_normal(
+                        'b_v_zneg_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
+            if self.b_a_dmed:
+                knodes.update(self._create_family_normal(
+                    'b_a_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
+            if self.b_t_dmed:
+                knodes.update(self._create_family_normal(
+                        'b_t_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
+            if self.b_z_dmed:
+                knodes.update(self._create_family_normal(
+                        'b_z_dmed', value=0, g_mu=0.2, g_tau=3**-2, std_lower=1e-10, std_upper=10, std_value=.1))
+        else:
+            if self.b_v_dmed:
+                knodes['b_v_dmed_bottom'] = Knode(pymc.Normal, 'b_v_dmed', mu=0, tau=2**-2, value=0, depends=self.depends['b_v_dmed'])
+            if self.b_v_zpos_dmed:
+                knodes['b_v_zpos_dmed_bottom'] = Knode(pymc.Normal, 'b_v_zpos_dmed', mu=0, tau=2**-2, value=0, depends=self.depends['b_v_zpos_dmed'])
+            if self.b_v_zneg_dmed:
+                knodes['b_v_zneg_dmed_bottom'] = Knode(pymc.Normal, 'b_v_zneg_dmed', mu=0, tau=2**-2, value=0, depends=self.depends['b_v_zneg_dmed'])
+            if self.b_a_dmed:
+                knodes['b_a_dmed_bottom'] = Knode(pymc.Normal, 'b_a_dmed', mu=0, tau=2**-2, value=0, depends=self.depends['b_a_dmed'])
+            if self.b_t_dmed:
+                knodes['b_t_dmed_bottom'] = Knode(pymc.Normal, 'b_t_dmed', mu=0, tau=2**-2, value=0, depends=self.depends['b_t_dmed'])
+            if self.b_z_dmed:
+                knodes['b_z_dmed_bottom'] = Knode(pymc.Normal, 'b_z_dmed', mu=0, tau=2**-2, value=0, depends=self.depends['b_z_dmed'])
+
+
         return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
