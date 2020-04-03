@@ -100,7 +100,7 @@ def wiener_like_nn(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_res
 
     for i in range(size):
         #use the predict function instead of full_pdf
-        p = ktnp.predict(np.array([v,a,z,t,x[i],nn_response[i]]),weights,biases,activations,len(activations))
+        p = ktnp.predict(np.array([v,a,z,t,x[i], nn_response[i]]), weights, biases, activations, len(activations))
         #p = full_pdf(x[i], v, sv, a, z, sz, t, st, err,
         #             n_st, n_sz, use_adaptive, simps_err)
         # If one probability = 0, the log sum will be -Inf
