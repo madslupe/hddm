@@ -113,6 +113,42 @@ def wiener_like_nn(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_res
 
     return sum_logp
 
+
+def wiener_like_nn_collapsing(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response,activations, weights, biases, double v, double sv, double a, double theta, double z, double sz, double t,
+                double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
+                double p_outlier=0, double w_outlier=0):
+    cdef Py_ssize_t size = x.shape[0]
+    cdef Py_ssize_t i
+    cdef double p
+    cdef double sum_logp = 0
+    cdef double wp_outlier = w_outlier * p_outlier
+
+    #create an array/vector in the required format:
+    # v
+    # a
+    # w (z)
+    # ndt (t)
+    # rt (in seconds)
+    # nn_response (-1 and 1)
+
+    if not p_outlier_in_range(p_outlier):
+        return -np.inf
+
+    for i in range(size):
+        #use the predict function instead of full_pdf
+        p = ktnp.predict(np.array([v,a,z,t,theta,x[i], nn_response[i]]), weights, biases, activations, len(activations))
+        #p = full_pdf(x[i], v, sv, a, z, sz, t, st, err,
+        #             n_st, n_sz, use_adaptive, simps_err)
+        # If one probability = 0, the log sum will be -Inf
+        p = p * (1 - p_outlier) + wp_outlier
+        if p == 0:
+            return -np.inf
+
+        #alread calculated as log, so just adding p, not log(p)
+        sum_logp += p
+
+    return sum_logp
+
 def wiener_like_rlddm(np.ndarray[double, ndim=1] x,
                       np.ndarray[long, ndim=1] response,
                       np.ndarray[double, ndim=1] feedback,
