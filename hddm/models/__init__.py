@@ -8,6 +8,7 @@ from .hddm_rl import HDDMrl
 from .rl import Hrl
 from .hddm_nn import HDDMnn
 from .hddm_nn_collapsing import HDDMnn_collapsing
+from .hddm_nn_regression import HDDMnnRegressor
 
 __all__ = ['AccumulatorModel',
            'HDDMBase',
@@ -20,4 +21,5 @@ __all__ = ['AccumulatorModel',
            'Hrl',
            'HDDMnn',
            'HDDMnn_collapsing',
+           'HDDMnnRegressor',
 ]
