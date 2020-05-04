@@ -137,6 +137,9 @@ def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=
             #print(params_iter['t'])
             #print(params_iter['theta'])
             #print(params_iter['a'])
+            #print(i)
+            #print(x[i])
+
 
             p = ktnp.predict(np.array([params_iter['v'][0],params_iter['a'],params_iter['z'],params_iter['t'],params_iter['theta'],x[i], nn_response[i]]), weights, biases, activations, len(activations))
 
@@ -147,7 +150,7 @@ def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=
             #                 't'], params_iter['st'],
             #             err, n_st, n_sz, use_adaptive, simps_err)
             p = p * (1 - p_outlier) + wp_outlier
-            sum_logp += log(p)
+            sum_logp += p
 
         return sum_logp
 
