@@ -27,12 +27,16 @@ class HDDMnn_collapsing(HDDM):
 
     def _create_stochastic_knodes(self, include):
         knodes = super(HDDMnn_collapsing, self)._create_stochastic_knodes(include)
-        knodes.update(self._create_family_gamma_gamma_hnormal('theta', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+        #knodes.update(self._create_family_gamma_gamma_hnormal('theta', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+        knodes.update(self._create_family_trunc_normal('alpha', lower=1e-3, upper=6, value=1))
+        knodes.update(self._create_family_trunc_normal('beta', lower=1e-3, upper=8, value=1))
         return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = super(HDDMnn_collapsing, self)._create_wfpt_parents_dict(knodes)
-        wfpt_parents['theta'] = knodes['theta_bottom']
+        #wfpt_parents['theta'] = knodes['theta_bottom']
+        wfpt_parents['alpha'] = knodes['alpha_bottom']
+        wfpt_parents['beta'] = knodes['beta_bottom']
         return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):
@@ -40,7 +44,7 @@ class HDDMnn_collapsing(HDDM):
         return Knode(self.wfpt_nn_collapsing_class, 'wfpt', observed=True, col_name=['nn_response', 'rt'], **wfpt_parents)
 
 
-def wienernn_like_collapsing(x, v, sv, a, theta, z, sz, t, st, p_outlier=0):
+def wienernn_like_collapsing(x, v, sv, a, alpha, beta, z, sz, t, st, p_outlier=0): #theta
 
     wiener_params = {'err': 1e-4, 'n_st': 2, 'n_sz': 2,
                      'use_adaptive': 1,
@@ -56,5 +60,5 @@ def wienernn_like_collapsing(x, v, sv, a, theta, z, sz, t, st, p_outlier=0):
         activations = pickle.load(tmp_file)
 
     nn_response = x['nn_response'].values.astype(int)
-    return wiener_like_nn_collapsing(np.absolute(x['rt'].values), nn_response, activations, weights, biases, v, sv, a, theta, z, sz, t, st, p_outlier=p_outlier, **wp)
+    return wiener_like_nn_collapsing(np.absolute(x['rt'].values), nn_response, activations, weights, biases, v, sv, a, alpha, beta, z, sz, t, st, p_outlier=p_outlier, **wp)
 Wienernn_collapsing = stochastic_from_dist('Wienernn_collapsing', wienernn_like_collapsing)

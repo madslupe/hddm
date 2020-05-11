@@ -142,9 +142,9 @@ class HDDM(HDDMBase):
     def _create_stochastic_knodes_noninfo(self, include):
         knodes = OrderedDict()
         if 'a' in include:
-            knodes.update(self._create_family_trunc_normal('a', lower=1e-3, upper=1e3, value=1))
+            knodes.update(self._create_family_trunc_normal('a', lower=1e-3, upper=3, value=1))
         if 'v' in include:
-            knodes.update(self._create_family_normal_normal_hnormal('v', value=0, g_tau=50**-2, std_std=10))
+            knodes.update(self._create_family_normal_normal_hnormal('v', value=0, g_tau=20, std_std=10))
         if 't' in include:
             knodes.update(self._create_family_trunc_normal('t', lower=1e-3, upper=1e3, value=.01))
         if 'sv' in include:
