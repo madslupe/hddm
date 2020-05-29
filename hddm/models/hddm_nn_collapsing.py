@@ -21,22 +21,28 @@ class HDDMnn_collapsing(HDDM):
 
     def __init__(self, *args, **kwargs):
         self.non_centered = kwargs.pop('non_centered', False)
+        self.free = kwargs.pop('free',True)
+        self.k = kwargs.pop('k',False)
         self.wfpt_nn_collapsing_class = Wienernn_collapsing
 
         super(HDDMnn_collapsing, self).__init__(*args, **kwargs)
 
     def _create_stochastic_knodes(self, include):
         knodes = super(HDDMnn_collapsing, self)._create_stochastic_knodes(include)
-        #knodes.update(self._create_family_gamma_gamma_hnormal('theta', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
-        knodes.update(self._create_family_trunc_normal('alpha', lower=1e-3, upper=6, value=1))
-        knodes.update(self._create_family_trunc_normal('beta', lower=1e-3, upper=8, value=1))
+        if self.free:
+            knodes.update(self._create_family_gamma_gamma_hnormal('beta', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+            if self.k:
+                knodes.update(self._create_family_gamma_gamma_hnormal('alpha', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+        else:
+            knodes.update(self._create_family_trunc_normal('beta', lower=0.3, upper=7, value=1))
+            if self.k:
+                knodes.update(self._create_family_trunc_normal('alpha', lower=0.3, upper=5, value=1))
         return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
         wfpt_parents = super(HDDMnn_collapsing, self)._create_wfpt_parents_dict(knodes)
-        #wfpt_parents['theta'] = knodes['theta_bottom']
-        wfpt_parents['alpha'] = knodes['alpha_bottom']
         wfpt_parents['beta'] = knodes['beta_bottom']
+        wfpt_parents['alpha'] = knodes['alpha_bottom'] if self.k else 3.00
         return wfpt_parents
 
     def _create_wfpt_knode(self, knodes):

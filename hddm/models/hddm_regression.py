@@ -38,16 +38,18 @@ def generate_wfpt_reg_stochastic_class(wiener_params=None, sampling_method='cdf'
         param_dict = deepcopy(self.parents.value)
         del param_dict['reg_outcomes']
         sampled_rts = self.value.copy()
-
+        #print(sampled_rts)
+        #print(self.value.index)
         for i in self.value.index:
             #get current params
+            #print(i)
             for p in self.parents['reg_outcomes']:
                 param_dict[p] = np.asscalar(self.parents.value[p].loc[i])
             #sample
             samples = hddm.generate.gen_rts(method=sampling_method,
                                             size=1, dt=sampling_dt, **param_dict)
 
-            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt
+            sampled_rts.at[i, 'rt'] = hddm.utils.flip_errors(samples).rt
 
         return sampled_rts
 

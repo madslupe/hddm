@@ -23,7 +23,7 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params=None, sampling_method='c
                          'w_outlier': 0.1}
     wp = wiener_params
 
-    def wienerNN_multi_like(value, v, sv, a, z, sz, t, st, theta, reg_outcomes, p_outlier=0):
+    def wienerNN_multi_like(value, v, sv, a, z, sz, t, st, alpha, beta, reg_outcomes, p_outlier=0):
         """Log-likelihood for the full DDM using the interpolation method"""
         nn_response = value['nn_response'].values.astype(int)
         with open("weights.pickle", "rb") as tmp_file:
@@ -32,12 +32,12 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params=None, sampling_method='c
             biases = pickle.load(tmp_file)
         with open('activations.pickle', 'rb') as tmp_file:
             activations = pickle.load(tmp_file)
-        params = {'v': v, 'sv': sv, 'a': a, 'z': z, 'sz': sz, 't': t, 'st': st, 'theta': theta}
+        params = {'v': v, 'sv': sv, 'a': a, 'z': z, 'sz': sz, 't': t, 'st': st, 'alpha': alpha,'beta': beta}
         for reg_outcome in reg_outcomes:
             params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
         return hddm.wfpt.wiener_like_multi_nnddm(value['rt'].values, nn_response, activations, weights, biases, 
                                            params['v'], params['sv'], params['a'], params['z'],
-                                           params['sz'], params['t'], params['st'],params['theta'], 1e-4,
+                                           params['sz'], params['t'], params['st'],params['alpha'],params['beta'], 1e-4,
                                            reg_outcomes,
                                            p_outlier=p_outlier)
 
@@ -111,7 +111,7 @@ class HDDMnnRegressor(HDDM):
 
     def __init__(self, data, models, group_only_regressors=True, keep_regressor_trace=False, **kwargs):
         """Instantiate a regression model.
-
+        
         :Arguments:
 
             * data : pandas.DataFrame
@@ -164,7 +164,8 @@ class HDDMnnRegressor(HDDM):
             and v_C(condition)[T.cond2] for cond1+cond2.
 
         """
-
+        self.free = kwargs.pop('free',True)
+        self.k = kwargs.pop('k',False)
         self.keep_regressor_trace = keep_regressor_trace
         if isinstance(models, (str, dict)):
             models = [models]
@@ -233,14 +234,21 @@ class HDDMnnRegressor(HDDM):
         super(HDDMnnRegressor, self).__setstate__(d)
 
     def _create_stochastic_knodes_nn(self, include):
-        knodes = super(HDDMnnRegressor, self)._create_stochastic_knodes(include)
-        if 'theta' in include:            
-            knodes.update(self._create_family_gamma_gamma_hnormal('theta', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+        knodes = super(HDDMnnRegressor, self)._create_stochastic_knodes(include)     
+        if self.free:
+            knodes.update(self._create_family_gamma_gamma_hnormal('beta', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+            if self.k:
+                knodes.update(self._create_family_gamma_gamma_hnormal('alpha', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+        else:
+            knodes.update(self._create_family_trunc_normal('beta', lower=0.3, upper=7, value=1))
+            if self.k:
+                knodes.update(self._create_family_trunc_normal('alpha', lower=0.3, upper=5, value=1))
         return knodes
 
     def _create_wfpt_knode(self, knodes):
         wfpt_parents = super(HDDMnnRegressor, self)._create_wfpt_parents_dict(knodes)
-        wfpt_parents['theta'] = knodes['theta_bottom']
+        wfpt_parents['beta'] = knodes['beta_bottom']
+        wfpt_parents['alpha'] = knodes['alpha_bottom'] if self.k else 3.00
         return Knode(self.wfpt_reg_class, 'wfpt', observed=True,
                      col_name=['nn_response', 'rt'],
                      reg_outcomes=self.reg_outcomes, **wfpt_parents)
