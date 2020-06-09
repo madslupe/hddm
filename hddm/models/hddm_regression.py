@@ -49,7 +49,7 @@ def generate_wfpt_reg_stochastic_class(wiener_params=None, sampling_method='cdf'
             samples = hddm.generate.gen_rts(method=sampling_method,
                                             size=1, dt=sampling_dt, **param_dict)
 
-            sampled_rts.loc[i, 'rt'] = hddm.utils.flip_errors(samples).rt.iloc[0]
+            sampled_rts.at[i, 'rt'] = hddm.utils.flip_errors(samples).rt.iloc[0]
 
         return sampled_rts
 
