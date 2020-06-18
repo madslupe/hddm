@@ -20,7 +20,7 @@ from copy import copy
 import numpy as np
 
 #for the nn_like
-import ckeras_to_numpy as ktnp
+#import ckeras_to_numpy as ktnp
 from tensorflow import keras
 import pandas as pd
 
@@ -120,7 +120,7 @@ def wiener_like_nn(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_res
     if not p_outlier_in_range(p_outlier):
         return -np.inf
 
-    p = ktnp.predict(np.array([vf,af,zf,tf,x, nn_response[i]]), weights, biases, activations, len(activations))
+    p = 0.1 #ktnp.predict(np.array([vf,af,zf,tf,x, nn_response[i]]), weights, biases, activations, len(activations))
     #p = full_pdf(x[i], v, sv, a, z, sz, t, st, err,
     #             n_st, n_sz, use_adaptive, simps_err)
     # If one probability = 0, the log sum will be -Inf
@@ -176,7 +176,7 @@ def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=
             #print(x[i])
 
 
-            p = ktnp.predict(np.array([params_iter['v'][0],params_iter['a'],params_iter['z'],params_iter['t'],params_iter['alpha'],params_iter['beta'],x[i], nn_response[i]]), weights, biases, activations, len(activations))
+            p = 0.1 #ktnp.predict(np.array([params_iter['v'][0],params_iter['a'],params_iter['z'],params_iter['t'],params_iter['alpha'],params_iter['beta'],x[i], nn_response[i]]), weights, biases, activations, len(activations))
 
             #print(p)
             #full_pdf(x[i], params_iter['v'],
@@ -269,7 +269,7 @@ def wiener_like_nn_collapsing(np.ndarray[double, ndim=1] x, np.ndarray[long, ndi
         #print(type(v))
         #print(v)
         #use the predict function instead of full_pdf
-        p = ktnp.predict(np.array([v,a,z,t, alpha, beta, x[i], nn_response[i]]), weights, biases, activations, len(activations))
+        p = 0.1 #ktnp.predict(np.array([v,a,z,t, alpha, beta, x[i], nn_response[i]]), weights, biases, activations, len(activations))
         #p = full_pdf(x[i], v, sv, a, z, sz, t, st, err,
         #             n_st, n_sz, use_adaptive, simps_err)
         # If one probability = 0, the log sum will be -Inf
@@ -306,7 +306,7 @@ def wiener_like_nn_angle(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] 
         #print(type(v))
         #print(v)
         #use the predict function instead of full_pdf
-        p = ktnp.predict(np.array([v,a,z,t,theta, x[i], nn_response[i]]), weights, biases, activations, len(activations))
+        p =  0.1 #ktnp.predict(np.array([v,a,z,t,theta, x[i], nn_response[i]]), weights, biases, activations, len(activations))
         #p = full_pdf(x[i], v, sv, a, z, sz, t, st, err,
         #             n_st, n_sz, use_adaptive, simps_err)
         # If one probability = 0, the log sum will be -Inf
