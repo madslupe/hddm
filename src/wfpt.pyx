@@ -33,9 +33,23 @@ from cython.parallel import *
 # include "pdf.pxi"
 include 'integrate.pxi'
 
+weibull_model = keras.models.load_model('model_final_weibull.h5', compile = False)
+angle_model = keras.models.load_model('model_final_angle.h5', compile = False)
 model = keras.models.load_model('model_final.h5', compile = False)
 
 def mlp_target(np.ndarray[double, ndim=2] params,
+                   np.ndarray[double, ndim=2] data, 
+                   ll_min = -16.11809 # corresponds to 1e-7
+                   ): 
+
+    n_params = 4
+    mlp_input_batch = np.zeros((data.shape[0], params.shape[1] + 2), dtype = np.float32)
+    mlp_input_batch[:, :n_params] = params
+    mlp_input_batch[:, n_params:] = data
+    #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
+    return np.sum(np.core.umath.maximum(model.predict_on_batch(mlp_input_batch), ll_min))
+
+def mlp_target_weibull(np.ndarray[double, ndim=2] params,
                    np.ndarray[double, ndim=2] data, 
                    ll_min = -16.11809 # corresponds to 1e-7
                    ): 
@@ -45,7 +59,19 @@ def mlp_target(np.ndarray[double, ndim=2] params,
     mlp_input_batch[:, :n_params] = params
     mlp_input_batch[:, n_params:] = data
     #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
-    return np.sum(np.core.umath.maximum(model.predict_on_batch(mlp_input_batch), ll_min))
+    return np.sum(np.core.umath.maximum(weibull_model.predict_on_batch(mlp_input_batch), ll_min))
+
+def mlp_target_angle(np.ndarray[double, ndim=2] params,
+                   np.ndarray[double, ndim=2] data, 
+                   ll_min = -16.11809 # corresponds to 1e-7
+                   ): 
+
+    n_params = 5
+    mlp_input_batch = np.zeros((data.shape[0], params.shape[1] + 2), dtype = np.float32)
+    mlp_input_batch[:, :n_params] = params
+    mlp_input_batch[:, n_params:] = data
+    #return np.sum(np.core.umath.maximum(ktnp.predict(mlp_input_batch, weights, biases, activations, n_layers), ll_min))
+    return np.sum(np.core.umath.maximum(angle_model.predict_on_batch(mlp_input_batch), ll_min))
 
 
 def pdf_array(np.ndarray[double, ndim=1] x, double v, double sv, double a, double z, double sz,
@@ -95,7 +121,7 @@ def wiener_like(np.ndarray[double, ndim=1] x, double v, double sv, double a, dou
     return sum_logp
 
 
-def wiener_like_nn(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, activations, weights, biases, double v, double sv, double a, double z, double sz, double t, 
+def wiener_like_nn(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, double v, double sv, double a, double z, double sz, double t, 
                 double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                 double p_outlier=0, double w_outlier=0):
     cdef Py_ssize_t size = x.shape[0]
@@ -103,50 +129,22 @@ def wiener_like_nn(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_res
     cdef double p
     cdef double sum_logp = 0
     cdef double wp_outlier = w_outlier * p_outlier
+    cdef double n_params = 4
 
-    cdef np.ndarray[long, ndim=1] vf = np.repeat(v,size)
-    cdef np.ndarray[long, ndim=1] af = np.repeat(a,size)
-    cdef np.ndarray[long, ndim=1] zf = np.repeat(z,size)
-    cdef np.ndarray[long, ndim=1] tf = np.repeat(t,size)
-
-    #create an array/vector in the required format:
-    # v
-    # a
-    # w (z)
-    # ndt (t)
-    # rt (in seconds)
-    # nn_response (-1 and 1)
+    cdef np.ndarray[double, ndim=1] vf = np.repeat(v,size)
+    cdef np.ndarray[double, ndim=1] af = np.repeat(a,size)
+    cdef np.ndarray[double, ndim=1] zf = np.repeat(z,size)
+    cdef np.ndarray[double, ndim=1] tf = np.repeat(t,size)
 
     if not p_outlier_in_range(p_outlier):
         return -np.inf
 
-    p = 0.1 #ktnp.predict(np.array([vf,af,zf,tf,x, nn_response[i]]), weights, biases, activations, len(activations))
-    #p = full_pdf(x[i], v, sv, a, z, sz, t, st, err,
-    #             n_st, n_sz, use_adaptive, simps_err)
-    # If one probability = 0, the log sum will be -Inf
-    p = p * (1 - p_outlier) + wp_outlier
-    
+    p = mlp_target(np.array([vf,af,zf,tf]).transpose(),np.array([x,nn_response]).transpose())
+
     if p == 0:
         return -np.inf
 
-    #alread calculated as log, so just adding p, not log(p)
-    sum_logp += p
-
-
-    #for i in range(size):
-        #use the predict function instead of full_pdf
-    #    p = ktnp.predict(np.array([v,a,z,t,x[i], nn_response[i]]), weights, biases, activations, len(activations))
-        #p = full_pdf(x[i], v, sv, a, z, sz, t, st, err,
-        #             n_st, n_sz, use_adaptive, simps_err)
-        # If one probability = 0, the log sum will be -Inf
-    #    p = p * (1 - p_outlier) + wp_outlier
-    #    if p == 0:
-    #        return -np.inf
-
-        #alread calculated as log, so just adding p, not log(p)
-    #    sum_logp += p
-
-    return sum_logp
+    return p
 
 def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, activations, weights, biases, v, sv, a, z, sz, t, st, alpha, beta, double err, multi=None,
                       int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-3,
@@ -189,7 +187,7 @@ def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=
 
         return sum_logp
 
-def wiener_like_nn_collapsing_keras(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, double v, double sv, double a, double alpha, double beta, double z, double sz, double t,
+def wiener_like_nn_weibull(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, double v, double sv, double a, double alpha, double beta, double z, double sz, double t,
                 double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                 double p_outlier=0, double w_outlier=0):
     cdef Py_ssize_t size = x.shape[0]
@@ -205,47 +203,18 @@ def wiener_like_nn_collapsing_keras(np.ndarray[double, ndim=1] x, np.ndarray[lon
     cdef np.ndarray[double, ndim=1] tf = np.repeat(t,size)
     cdef np.ndarray[double, ndim=1] betaf = np.repeat(beta,size)
     cdef np.ndarray[double, ndim=1] alphaf = np.repeat(alpha,size)
-    #create an array/vector in the required format:
-    # v
-    # a
-    # w (z)
-    # ndt (t)
-    # rt (in seconds)
-    # nn_response (-1 and 1)
 
-    #if not p_outlier_in_range(p_outlier):
-    #    return -np.inf
+    if not p_outlier_in_range(p_outlier):
+        return -np.inf
 
-    #for i in range(size):
-        #print(type(v))
-        #print(v)
-        #use the predict function instead of full_pdf
+    p = mlp_target_weibull(np.array([vf,af,zf,tf,alphaf,betaf]).transpose(),np.array([x,nn_response]).transpose())
 
-    #params = pd.DataFrame({'v':v,'a':a,'z':z,'t':t,'alpha':alpha,'beta':beta})
-    #data = pd.DataFrame({'x':x,'nn_response':nn_response})
-
-    #print(np.array([v,a,z,t,alpha,beta]).transpose())
-    #print(np.array([x,nn_response]).transpose())
-    #params = pd.DataFrame({'v':v,'a':a,'z':z,'t':t,'alpha':alpha,'beta':beta})
-    #data = pd.DataFrame({'x':x,'nn_response':nn_response})
-
-    #print(np.array([vf,af,zf,tf,alphaf,betaf]).transpose())
-    #print(np.array([x,nn_response]).transpose())
-
-    p = mlp_target(np.array([vf,af,zf,tf,alphaf,betaf]).transpose(),np.array([x,nn_response]).transpose())
-        #p = full_pdf(x[i], v, sv, a, z, sz, t, st, err,
-        #             n_st, n_sz, use_adaptive, simps_err)
-        # If one probability = 0, the log sum will be -Inf
-    #p = p * (1 - p_outlier) + wp_outlier
-    #if p == 0:
-    #    return -np.inf
-
-        #alread calculated as log, so just adding p, not log(p)
-    #sum_logp += p
+    if p == 0:
+        return -np.inf
 
     return p
 
-def wiener_like_nn_collapsing(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response,activations, weights, biases, double v, double sv, double a, double alpha, double beta, double z, double sz, double t,
+def wiener_like_nn_angle(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, double v, double sv, double a, double theta, double z, double sz, double t,
                 double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
                 double p_outlier=0, double w_outlier=0):
     cdef Py_ssize_t size = x.shape[0]
@@ -253,71 +222,23 @@ def wiener_like_nn_collapsing(np.ndarray[double, ndim=1] x, np.ndarray[long, ndi
     cdef double p
     cdef double sum_logp = 0
     cdef double wp_outlier = w_outlier * p_outlier
+    cdef double n_params = 5
 
-    #create an array/vector in the required format:
-    # v
-    # a
-    # w (z)
-    # ndt (t)
-    # rt (in seconds)
-    # nn_response (-1 and 1)
-
-    if not p_outlier_in_range(p_outlier):
-        return -np.inf
-
-    for i in range(size):
-        #print(type(v))
-        #print(v)
-        #use the predict function instead of full_pdf
-        p = 0.1 #ktnp.predict(np.array([v,a,z,t, alpha, beta, x[i], nn_response[i]]), weights, biases, activations, len(activations))
-        #p = full_pdf(x[i], v, sv, a, z, sz, t, st, err,
-        #             n_st, n_sz, use_adaptive, simps_err)
-        # If one probability = 0, the log sum will be -Inf
-        p = p * (1 - p_outlier) + wp_outlier
-        if p == 0:
-            return -np.inf
-
-        #alread calculated as log, so just adding p, not log(p)
-        sum_logp += p
-
-    return sum_logp
-
-def wiener_like_nn_angle(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response,activations, weights, biases, double v, double sv, double a, double theta, double z, double sz, double t,
-                double st, double err, int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-8,
-                double p_outlier=0, double w_outlier=0):
-    cdef Py_ssize_t size = x.shape[0]
-    cdef Py_ssize_t i
-    cdef double p
-    cdef double sum_logp = 0
-    cdef double wp_outlier = w_outlier * p_outlier
-
-    #create an array/vector in the required format:
-    # v
-    # a
-    # w (z)
-    # ndt (t)
-    # rt (in seconds)
-    # nn_response (-1 and 1)
+    cdef np.ndarray[double, ndim=1] vf = np.repeat(v,size)
+    cdef np.ndarray[double, ndim=1] af = np.repeat(a,size)
+    cdef np.ndarray[double, ndim=1] zf = np.repeat(z,size)
+    cdef np.ndarray[double, ndim=1] tf = np.repeat(t,size)
+    cdef np.ndarray[double, ndim=1] thetaf = np.repeat(theta,size)
 
     if not p_outlier_in_range(p_outlier):
         return -np.inf
 
-    for i in range(size):
-        #print(type(v))
-        #print(v)
-        #use the predict function instead of full_pdf
-        p =  0.1 #ktnp.predict(np.array([v,a,z,t,theta, x[i], nn_response[i]]), weights, biases, activations, len(activations))
-        #p = full_pdf(x[i], v, sv, a, z, sz, t, st, err,
-        #             n_st, n_sz, use_adaptive, simps_err)
-        # If one probability = 0, the log sum will be -Inf
-        p = p * (1 - p_outlier) + wp_outlier
-        if p == 0:
-            return -np.inf
+    p = mlp_target_angle(np.array([vf,af,zf,tf,thetaf]).transpose(),np.array([x,nn_response]).transpose())
 
-        #alread calculated as log, so just adding p, not log(p)
-        sum_logp += p
+    if p == 0:
+        return -np.inf
 
-    return sum_logp
+    return p
 
 def wiener_like_rlddm(np.ndarray[double, ndim=1] x,
                       np.ndarray[long, ndim=1] response,

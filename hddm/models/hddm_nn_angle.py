@@ -31,7 +31,7 @@ class HDDMnn_angle(HDDM):
         if self.free:
             knodes.update(self._create_family_gamma_gamma_hnormal('theta', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
         else:
-            knodes.update(self._create_family_gamma_gamma_hnormal('theta', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
+            knodes.update(self._create_family_trunc_normal('theta', lower=0, upper=1.2, value=0.5))
         return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
@@ -52,13 +52,6 @@ def wienernn_like_angle(x, v, sv, a, theta, z, sz, t, st, p_outlier=0):
                      'w_outlier': 0.1}
     wp = wiener_params
 
-    with open("weights.pickle", "rb") as tmp_file:
-        weights = pickle.load(tmp_file)
-    with open('biases.pickle', 'rb') as tmp_file:
-        biases = pickle.load(tmp_file)
-    with open('activations.pickle', 'rb') as tmp_file:
-        activations = pickle.load(tmp_file)
-
     nn_response = x['nn_response'].values.astype(int)
-    return wiener_like_nn_angle(np.absolute(x['rt'].values), nn_response, activations, weights, biases, v, sv, a, theta, z, sz, t, st, p_outlier=p_outlier, **wp)
+    return wiener_like_nn_angle(np.absolute(x['rt'].values), nn_response, v, sv, a, theta, z, sz, t, st, p_outlier=p_outlier, **wp)
 Wienernn_angle = stochastic_from_dist('Wienernn_angle', wienernn_like_angle)

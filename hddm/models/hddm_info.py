@@ -144,7 +144,7 @@ class HDDM(HDDMBase):
         if 'a' in include:
             knodes.update(self._create_family_trunc_normal('a', lower=0.3, upper=2, value=1))
         if 'v' in include:
-            knodes.update(self._create_family_trunc_normal('v', lower=-2, upper=2, value=1))
+            knodes.update(self._create_family_trunc_normal('v', lower=-2.7, upper=2.7, value=1))
         if 't' in include:
             knodes.update(self._create_family_trunc_normal('t', lower=1e-3, upper=2, value=.01))
         if 'sv' in include:

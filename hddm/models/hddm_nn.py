@@ -46,13 +46,6 @@ def wienernn_like(x, v, sv, a, z, sz, t, st, p_outlier=0):
                      'w_outlier': 0.1}
     wp = wiener_params
 
-    with open("weights.pickle", "rb") as tmp_file:
-        weights = pickle.load(tmp_file)
-    with open('biases.pickle', 'rb') as tmp_file:
-        biases = pickle.load(tmp_file)
-    with open('activations.pickle', 'rb') as tmp_file:
-        activations = pickle.load(tmp_file)
-
     nn_response = x['nn_response'].values.astype(int)
-    return wiener_like_nn(np.absolute(x['rt'].values), nn_response, activations, weights, biases, v, sv, a, z, sz, t, st, p_outlier=p_outlier, **wp)
+    return wiener_like_nn(np.absolute(x['rt'].values), nn_response, v, sv, a, z, sz, t, st, p_outlier=p_outlier, **wp)
 Wienernn = stochastic_from_dist('wienernn', wienernn_like)
