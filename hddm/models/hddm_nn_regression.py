@@ -35,7 +35,7 @@ def generate_wfpt_nn_reg_stochastic_class(wiener_params=None, sampling_method='c
         params = {'v': v, 'sv': sv, 'a': a, 'z': z, 'sz': sz, 't': t, 'st': st, 'alpha': alpha,'beta': beta}
         for reg_outcome in reg_outcomes:
             params[reg_outcome] = params[reg_outcome].loc[value['rt'].index].values
-        return hddm.wfpt.wiener_like_multi_nnddm(value['rt'].values, nn_response, activations, weights, biases, 
+        return hddm.wfpt.wiener_like_multi_nnddm(np.absolute(value['rt'].values), nn_response, activations, weights, biases, 
                                            params['v'], params['sv'], params['a'], params['z'],
                                            params['sz'], params['t'], params['st'],params['alpha'],params['beta'], 1e-4,
                                            reg_outcomes,
