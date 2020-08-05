@@ -146,6 +146,50 @@ def wiener_like_nn(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_res
 
     return p
 
+def wiener_like_multi_nnddm_weibull(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, activations, weights, biases, v, sv, a, z, sz, t, st, alpha, beta, double err, multi=None,
+                      int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-3,
+                      double p_outlier=0, double w_outlier=0):
+    cdef Py_ssize_t size = x.shape[0]
+    cdef Py_ssize_t i
+    cdef double p = 0
+    cdef double sum_logp = 0
+    cdef double wp_outlier = w_outlier * p_outlier
+
+    if multi is None:
+        return full_pdf(x, v, sv, a, z, sz, t, st, err)
+    else:
+        params = {'v': v, 'z': z, 't': t, 'a': a, 'sv': sv, 'sz': sz, 'st': st, 'alpha':alpha, 'beta': beta}
+        params_iter = copy(params)
+        for i in range(size):
+            for param in multi:
+                params_iter[param] = params[param][i]
+
+
+            cdef np.ndarray[double, ndim=1] vf = np.repeat(v,size)
+            cdef np.ndarray[double, ndim=1] af = np.repeat(a,size)
+            cdef np.ndarray[double, ndim=1] zf = np.repeat(z,size)
+            cdef np.ndarray[double, ndim=1] tf = np.repeat(t,size)
+            cdef np.ndarray[double, ndim=1] betaf = np.repeat(beta,size)
+            cdef np.ndarray[double, ndim=1] alphaf = np.repeat(alpha,size)
+
+            if not p_outlier_in_range(p_outlier):
+                return -np.inf
+
+            p = mlp_target_weibull(np.array([vf,af,zf,tf,alphaf,betaf]).transpose(),np.array([x,nn_response]).transpose())
+
+            if p == 0:
+                return -np.inf
+
+            return p
+            #print(type(params_iter['a'].astype(float)))
+            #print(params_iter['v'][0])
+            #print(params_iter['z'])
+            #print(params_iter['t'])
+            #print(params_iter['theta'])
+            #print(params_iter['a'])
+            #print(i)
+            #print(x[i])
+
 def wiener_like_multi_nnddm(np.ndarray[double, ndim=1] x, np.ndarray[long, ndim=1] nn_response, activations, weights, biases, v, sv, a, z, sz, t, st, alpha, beta, double err, multi=None,
                       int n_st=10, int n_sz=10, bint use_adaptive=1, double simps_err=1e-3,
                       double p_outlier=0, double w_outlier=0):
