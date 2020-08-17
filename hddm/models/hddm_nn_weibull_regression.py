@@ -103,7 +103,7 @@ class KnodeRegress(kabuki.hierarchical.Knode):
 
         return self.pymc_node(func, kwargs['doc'], name, parents=parents, trace=self.keep_regressor_trace)
 
-class HDDMnn_weibull_Regressor(HDDM):
+class HDDMnnWeibullRegressor(HDDM):
     """HDDMnnRegressor allows estimation of the NNDDM where parameter
     values are linear models of a covariate (e.g. a brain measure like
     fMRI or different conditions).
