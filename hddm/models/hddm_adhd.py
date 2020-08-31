@@ -19,31 +19,31 @@ class HDDMadhd(HDDM):
     """
 
     def __init__(self, *args, **kwargs):
-        self.b_v_zpos = kwargs.pop('b_v_zpos', False)
-        self.b_v_zneg = kwargs.pop('b_v_zneg', False)
-        self.b_v_dmed = kwargs.pop('b_v_dmed', False)
-        self.b_v_dsess = kwargs.pop('b_v_dsess', False)
+        self.b_v_zpos = kwargs.pop('b_v_zpos', True)
+        self.b_v_zneg = kwargs.pop('b_v_zneg', True)
+        self.b_v_dmed = kwargs.pop('b_v_dmed', True)
+        self.b_v_dsess = kwargs.pop('b_v_dsess', True)
 
-        self.b_v_zpos_dmed = kwargs.pop('b_v_zpos_dmed', False)
-        self.b_v_zneg_dmed = kwargs.pop('b_v_zneg_dmed', False)
-        self.b_v_zpos_dsess = kwargs.pop('b_v_zpos_dsess', False)
-        self.b_v_zneg_dsess = kwargs.pop('b_v_zneg_dsess', False)
-        self.b_v_dmed_dsess = kwargs.pop('b_v_dmed_dsess', False)
+        self.b_v_zpos_dmed = kwargs.pop('b_v_zpos_dmed', True)
+        self.b_v_zneg_dmed = kwargs.pop('b_v_zneg_dmed', True)
+        self.b_v_zpos_dsess = kwargs.pop('b_v_zpos_dsess', True)
+        self.b_v_zneg_dsess = kwargs.pop('b_v_zneg_dsess', True)
+        self.b_v_dmed_dsess = kwargs.pop('b_v_dmed_dsess', True)
 
-        self.b_v_zpos_dmed_dsess = kwargs.pop('b_v_zpos_dmed_dsess', False)
-        self.b_v_zneg_dmed_dsess = kwargs.pop('b_v_zneg_dmed_dsess', False)
+        self.b_v_zpos_dmed_dsess = kwargs.pop('b_v_zpos_dmed_dsess', True)
+        self.b_v_zneg_dmed_dsess = kwargs.pop('b_v_zneg_dmed_dsess', True)
 
-        self.b_a_dmed = kwargs.pop('b_a_dmed', False)
-        self.b_a_dsess = kwargs.pop('b_a_dsess', False)
-        self.b_a_dmed_dsess = kwargs.pop('b_a_dmed_dsess', False)
+        self.b_a_dmed = kwargs.pop('b_a_dmed', True)
+        self.b_a_dsess = kwargs.pop('b_a_dsess', True)
+        self.b_a_dmed_dsess = kwargs.pop('b_a_dmed_dsess', True)
 
-        self.b_t_dmed = kwargs.pop('b_t_dmed', False)
-        self.b_t_dsess = kwargs.pop('b_t_dsess', False)
-        self.b_t_dmed_dsess = kwargs.pop('b_t_dmed_dsess', False)
+        self.b_t_dmed = kwargs.pop('b_t_dmed', True)
+        self.b_t_dsess = kwargs.pop('b_t_dsess', True)
+        self.b_t_dmed_dsess = kwargs.pop('b_t_dmed_dsess', True)
 
-        self.b_z_dmed = kwargs.pop('b_z_dmed', False)
-        self.b_z_dsess = kwargs.pop('b_z_dsess', False)
-        self.b_z_dmed_dsess = kwargs.pop('b_z_dmed_dsess', False)
+        self.b_z_dmed = kwargs.pop('b_z_dmed', True)
+        self.b_z_dsess = kwargs.pop('b_z_dsess', True)
+        self.b_z_dmed_dsess = kwargs.pop('b_z_dmed_dsess', True)
 
         self.wfpt_adhd_class = WienerADHD
 
