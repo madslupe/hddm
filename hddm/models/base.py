@@ -367,6 +367,43 @@ class AccumulatorModel(kabuki.Hierarchical):
 
         return knodes
 
+    def _create_family_michael_normal(self, name, value=0, lower=None,
+                                   upper=None, std_lower=1e-10,
+                                   std_upper=1, std_value=.1):
+        """Similar to _create_family_normal() but creates a Uniform
+        group distribution and a truncated subject distribution.
+
+        See _create_family_normal() help for more information.
+
+        """
+        knodes = OrderedDict()
+
+        if self.is_group_model and name not in self.group_only_nodes:
+            g = Knode(pm.Uniform, '%s' % name, lower=lower,
+                      upper=upper, value=value, depends=self.depends[name])
+
+            depends_std = self.depends[name] if self.std_depends else ()
+            std = Knode(pm.Uniform, '%s_std' % name, lower=std_lower,
+                        upper=std_upper, value=std_value, depends=depends_std)
+            tau = Knode(pm.Deterministic, '%s_tau' % name,
+                        doc='%s_tau' % name, eval=lambda x: x**-2, x=std,
+                        plot=False, trace=False, hidden=True)
+            subj = Knode(pm.Normal, '%s_subj' % name, mu=g,
+                         tau=tau, value=value,
+                         depends=('subj_idx',), subj=True, plot=self.plot_subjs)
+
+            knodes['%s'%name] = g
+            knodes['%s_std'%name] = std
+            knodes['%s_tau'%name] = tau
+            knodes['%s_bottom'%name] = subj
+
+        else:
+            subj = Knode(pm.Uniform, name, lower=lower,
+                         upper=upper, value=value,
+                         depends=self.depends[name])
+            knodes['%s_bottom'%name] = subj
+
+        return knodes
 
     def _create_family_trunc_normal(self, name, value=0, lower=None,
                                    upper=None, std_lower=1e-10,
