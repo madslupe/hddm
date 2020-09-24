@@ -34,9 +34,9 @@ class HDDMnn_weibull(HDDM):
             if self.k:
                 knodes.update(self._create_family_gamma_gamma_hnormal('alpha', g_mean=1.5, g_std=0.75, std_std=2, std_value=0.1, value=1))
         else:
-            knodes.update(self._create_family_trunc_normal('beta', lower=0.3, upper=7, value=1))
+            knodes.update(self._create_family_michael_normal('beta', lower=0.3, upper=7, value=1))
             if self.k:
-                knodes.update(self._create_family_trunc_normal('alpha', lower=0.3, upper=5, value=1))
+                knodes.update(self._create_family_michael_normal('alpha', lower=0.3, upper=5, value=1))
         return knodes
 
     def _create_wfpt_parents_dict(self, knodes):
