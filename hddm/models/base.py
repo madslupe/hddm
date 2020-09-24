@@ -368,7 +368,7 @@ class AccumulatorModel(kabuki.Hierarchical):
         return knodes
 
     def _create_family_michael_normal(self, name, value=0, lower=None,
-                                   upper=None, std_lower=1e-10,
+                                   upper=None, g_mu=None, g_tau=15**-2, std_lower=1e-10,
                                    std_upper=1, std_value=.1):
         """Similar to _create_family_normal() but creates a Uniform
         group distribution and a truncated subject distribution.
@@ -376,7 +376,10 @@ class AccumulatorModel(kabuki.Hierarchical):
         See _create_family_normal() help for more information.
 
         """
-        knodes = OrderedDict()
+        if g_mu is None:
+            g_mu = value
+
+            knodes = OrderedDict()
 
         if self.is_group_model and name not in self.group_only_nodes:
              g = Knode(pm.Normal, '%s' % name, mu=g_mu, tau=g_tau,
