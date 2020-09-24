@@ -379,7 +379,7 @@ class AccumulatorModel(kabuki.Hierarchical):
         if g_mu is None:
             g_mu = value
 
-            knodes = OrderedDict()
+        knodes = OrderedDict()
 
         if self.is_group_model and name not in self.group_only_nodes:
             g = Knode(pm.Normal, '%s' % name, mu=g_mu, tau=g_tau,
