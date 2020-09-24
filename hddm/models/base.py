@@ -388,9 +388,12 @@ class AccumulatorModel(kabuki.Hierarchical):
             tau = Knode(pm.Deterministic, '%s_tau' % name,
                         doc='%s_tau' % name, eval=lambda x: x**-2, x=std,
                         plot=False, trace=False, hidden=True)
-            subj = Knode(pm.Normal, '%s_subj' % name, mu=g,
-                         tau=tau, value=value,
+            subj = Knode(pm.TruncatedNormal, '%s_subj' % name, mu=g,
+                         tau=tau, a=lower, b=upper, value=value,
                          depends=('subj_idx',), subj=True, plot=self.plot_subjs)
+            #subj = Knode(pm.Normal, '%s_subj' % name, mu=g,
+             #            tau=tau, value=value,
+              #           depends=('subj_idx',), subj=True, plot=self.plot_subjs)
 
             knodes['%s'%name] = g
             knodes['%s_std'%name] = std
