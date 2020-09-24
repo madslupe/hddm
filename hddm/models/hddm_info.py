@@ -146,7 +146,7 @@ class HDDM(HDDMBase):
         if 'v' in include:
             knodes.update(self._create_family_trunc_normal('v', lower=-2.7, upper=2.7, value=1))
         if 't' in include:
-            knodes.update(self._create_family_trunc_normal('t', lower=1e-3, upper=2, value=.01))
+            knodes.update(self._create_family_trunc_normal('t', lower=1e-3, upper=2, std_lower=1e-3, std_upper=1, value=.01))
         if 'sv' in include:
             knodes['sv_bottom'] = Knode(pm.Uniform, 'sv', lower=1e-6, upper=1e3, value=1, depends=self.depends['sv'])
         if 'sz' in include:
