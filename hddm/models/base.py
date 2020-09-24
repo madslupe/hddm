@@ -382,11 +382,11 @@ class AccumulatorModel(kabuki.Hierarchical):
         knodes = OrderedDict()
 
         if self.is_group_model and name not in self.group_only_nodes:
-            g = Knode(pm.Normal, '%s' % name, mu=g_mu, tau=g_tau,
-                      value=value, depends=self.depends[name])
+            #g = Knode(pm.Normal, '%s' % name, mu=g_mu, tau=g_tau,
+             #         value=value, depends=self.depends[name])
 
-            #g = Knode(pm.Uniform, '%s' % name, lower=lower,
-             #          upper=upper, value=value, depends=self.depends[name])
+            g = Knode(pm.Uniform, '%s' % name, lower=lower,
+                       upper=upper, value=value, depends=self.depends[name])
 
             depends_std = self.depends[name] if self.std_depends else ()
             std = Knode(pm.Uniform, '%s_std' % name, lower=std_lower,
